@@ -1,0 +1,54 @@
+{
+  "packages": [
+    { 
+      "id": 1, 
+      "slug": "ho-ho-ho", 
+      "name": "Experiência Ho-Ho-Ho", 
+      "durationMinutes": 20 
+    },
+    { 
+      "id": 2, 
+      "slug": "entao-e-natal", 
+      "name": "Experiência Então é Natal", 
+      "durationMinutes": 30,
+      "badges": ["Mais procurado"]
+    },
+    { 
+      "id": 3, 
+      "slug": "boas-festas", 
+      "name": "Experiência Boas Festas", 
+      "durationMinutes": 60 
+    }
+  ],
+  "availability": {
+    "packageId": 2,
+    "startDate": "2025-01-10",
+    "endDate": "2025-02-28",
+    "minAdvanceHours": 12,
+    "eventDurationMinutes": 30,
+    "weekAvailability": {
+      "Monday": ["13:00", "14:00", "18:00", "19:00"],
+      "Tuesday": ["13:00", "14:00", "18:00", "19:00"],
+      "Wednesday": ["13:00", "14:00", "18:00", "19:00"],
+      "Thursday": ["13:00", "14:00", "18:00", "19:00"],
+      "Friday": ["13:00", "14:00", "18:00", "19:00"],
+      "Saturday": ["08:00", "09:00", "10:00", "13:00", "14:00", "17:00"],
+      "Sunday": ["08:00", "09:00", "10:00", "16:00"]
+    },
+    "specificDates": ["2025-01-12", "2025-01-19"],
+    "specificDateAvailability": {
+      "2025-01-12": ["08:00", "13:00", "14:00"],
+      "2025-01-19": ["08:00", "09:00", "13:00", "17:00"]
+    },
+    "holidays": {
+      "2025-02-17": { "name": "Carnaval", "times": ["08:00", "09:00", "10:00", "16:00"] },
+      "2025-02-18": { "name": "Carnaval", "times": ["08:00", "09:00", "10:00", "16:00"] }
+    },
+    "busyEvents": [
+      { "start": "2025-01-15T13:00:00-03:00", "end": "2025-01-15T13:30:00-03:00", "summary": "Agendado" },
+      { "start": "2025-01-22T09:00:00-03:00", "end": "2025-01-22T09:30:00-03:00", "summary": "Agendado" },
+      { "start": "2025-02-01T18:00:00-03:00", "end": "2025-02-01T18:30:00-03:00", "summary": "Agendado" },
+      { "start": "2025-02-08T14:00:00-03:00", "end": "2025-02-08T14:30:00-03:00", "summary": "Agendado" }
+    ]
+  }
+}
