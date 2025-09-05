@@ -90,12 +90,21 @@ All colors MUST be HSL for semantic theming.
   /* Christmas button variants */
   .btn-christmas {
     @apply bg-gradient-to-r from-primary to-secondary text-primary-foreground;
-    @apply hover:shadow-christmas transition-all duration-300;
+    @apply transition-all duration-300;
+    box-shadow: var(--shadow-christmas);
+  }
+
+  .btn-christmas:hover {
+    box-shadow: var(--shadow-christmas);
   }
 
   .btn-gold {
     @apply bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground;
-    @apply hover:shadow-glow transition-all duration-300;
+    @apply transition-all duration-300;
+  }
+
+  .btn-gold:hover {
+    box-shadow: var(--shadow-glow);
   }
 
   /* Mobile touch targets */
@@ -110,7 +119,19 @@ All colors MUST be HSL for semantic theming.
   }
 
   .glow-effect {
-    @apply shadow-glow;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .shadow-christmas {
+    box-shadow: var(--shadow-christmas);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
   }
 }
 
