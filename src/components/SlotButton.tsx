@@ -12,11 +12,12 @@ export function SlotButton({ time, onClick, disabled = false }: SlotButtonProps)
     <Button
       onClick={onClick}
       disabled={disabled}
-      className="w-full touch-target bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-secondary text-primary-foreground font-medium shadow-christmas hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-      size="lg"
+      className="w-full touch-large bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-secondary text-primary-foreground font-bold shadow-button hover:shadow-christmas active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none rounded-[var(--button-radius)]"
     >
-      <Clock className="w-4 h-4 mr-2" />
-      {time}
+      <div className="flex items-center justify-center gap-2">
+        <Clock className="w-4 h-4" />
+        <span className="text-lg">{time}</span>
+      </div>
     </Button>
   );
 }

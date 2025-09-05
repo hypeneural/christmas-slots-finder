@@ -10,36 +10,40 @@ interface PackageInfoProps {
 
 export function PackageInfo({ package: pkg }: PackageInfoProps) {
   return (
-    <Card className="mx-4 mb-6 bg-card/50 backdrop-blur border-border/50">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold text-foreground mb-1">
-              {pkg.name}
-            </h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm">
-                {i18n.duration(pkg.durationMinutes)}
-              </span>
+    <div className="app-section">
+      <Card className="app-card">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-foreground mb-2">
+                {pkg.name}
+              </h2>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="p-2 rounded-full bg-primary/20">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-base font-medium">
+                  {i18n.duration(pkg.durationMinutes)}
+                </span>
+              </div>
             </div>
+            
+            {pkg.badges && pkg.badges.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {pkg.badges.map((badge, index) => (
+                  <Badge 
+                    key={index}
+                    variant="secondary"
+                    className="text-xs bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-button"
+                  >
+                    {badge}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
-          
-          {pkg.badges && pkg.badges.length > 0 && (
-            <div className="flex flex-col gap-1">
-              {pkg.badges.map((badge, index) => (
-                <Badge 
-                  key={index}
-                  variant="secondary"
-                  className="text-xs bg-gradient-to-r from-accent to-accent/80 text-accent-foreground"
-                >
-                  {badge}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

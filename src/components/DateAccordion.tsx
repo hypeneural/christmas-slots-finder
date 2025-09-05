@@ -14,16 +14,16 @@ export function DateAccordion({ slots, onSlotClick }: DateAccordionProps) {
 
   if (sortedDates.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
-        <p>Nenhum horário disponível</p>
+      <div className="text-center py-12 text-muted-foreground">
+        <div className="text-4xl mb-4">📅</div>
+        <p className="text-lg">Nenhum horário disponível</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <Accordion type="multiple" className="w-full space-y-2">
+    <div className="space-y-4">
+      <Accordion type="multiple" className="w-full space-y-3">
         {sortedDates.map((dateStr) => {
           const date = parseISO(dateStr);
           const dateLabel = format(date, 'dd/MM', { locale: ptBR });
@@ -34,28 +34,32 @@ export function DateAccordion({ slots, onSlotClick }: DateAccordionProps) {
             <AccordionItem
               key={dateStr}
               value={dateStr}
-              className="border border-border/50 rounded-lg bg-card/30 backdrop-blur"
+              className="app-card border-border/30"
             >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-3 text-left">
-                  <Calendar className="w-5 h-5 text-primary" />
-                  <div>
-                    <div className="font-semibold text-foreground">
+              <AccordionTrigger className="px-6 py-4 hover:no-underline transition-all duration-200 hover:bg-primary/5">
+                <div className="flex items-center gap-4 text-left w-full">
+                  <div className="p-3 rounded-full bg-primary/20 flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-lg font-bold text-foreground">
                       {dateLabel}
                     </div>
-                    <div className="text-sm text-muted-foreground capitalize">
+                    <div className="text-sm text-muted-foreground capitalize font-medium">
                       {dayLabel}
                     </div>
                   </div>
-                  <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    <span>{times.length} horários</span>
+                  <div className="flex items-center gap-2 bg-secondary/20 px-3 py-1 rounded-full">
+                    <Clock className="w-4 h-4 text-secondary" />
+                    <span className="text-sm font-semibold text-secondary">
+                      {times.length} horário{times.length > 1 ? 's' : ''}
+                    </span>
                   </div>
                 </div>
               </AccordionTrigger>
               
-              <AccordionContent className="px-4 pb-4">
-                <div className="grid grid-cols-2 gap-3 mt-2">
+              <AccordionContent className="px-6 pb-6">
+                <div className="grid grid-cols-2 gap-3 mt-4">
                   {times.map((time) => (
                     <SlotButton
                       key={time}

@@ -10,10 +10,9 @@ export function WhatsAppFAB() {
   return (
     <Button
       onClick={handleWhatsAppClick}
-      className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-christmas pulse-christmas z-50"
-      size="icon"
+      className="fixed bottom-8 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-primary to-secondary shadow-christmas hover:shadow-glow pulse-christmas z-50 bounce-subtle scale-tap border-2 border-background/20"
     >
-      <MessageCircle className="w-6 h-6 text-primary-foreground" />
+      <MessageCircle className="w-7 h-7 text-primary-foreground" />
       <span className="sr-only">Contato WhatsApp</span>
     </Button>
   );

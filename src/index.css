@@ -47,15 +47,22 @@ All colors MUST be HSL for semantic theming.
     --gradient-glow: linear-gradient(135deg, hsl(var(--primary-glow)), hsl(var(--accent)));
 
     /* Christmas Shadows */
-    --shadow-christmas: 0 10px 30px -10px hsl(var(--primary) / 0.3);
-    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.4);
-    --shadow-card: 0 8px 25px -5px hsl(355 25% 3% / 0.5);
+    --shadow-christmas: 0 10px 30px -10px hsl(var(--primary) / 0.4);
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.5);
+    --shadow-card: 0 8px 25px -5px hsl(355 25% 3% / 0.6);
+    --shadow-button: 0 4px 15px -2px hsl(var(--primary) / 0.3);
 
     /* Mobile Touch Targets */
-    --touch-target: 48px;
-    --touch-margin: 12px;
+    --touch-target: 56px;
+    --touch-margin: 16px;
+    
+    /* Native App Spacing */
+    --app-padding: 20px;
+    --section-gap: 24px;
+    --card-radius: 16px;
+    --button-radius: 12px;
 
-    --radius: 0.5rem;
+    --radius: 12px;
 
     --sidebar-background: 0 0% 98%;
 
@@ -72,8 +79,6 @@ All colors MUST be HSL for semantic theming.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
 }
 
 @layer base {
@@ -83,28 +88,58 @@ All colors MUST be HSL for semantic theming.
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
 @layer components {
+  /* Native App Styles */
+  .app-container {
+    @apply min-h-screen bg-background pb-24;
+  }
+
+  .app-section {
+    @apply px-[var(--app-padding)] mb-[var(--section-gap)];
+  }
+
+  .app-card {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-[var(--card-radius)] shadow-card;
+  }
+
   /* Christmas button variants */
   .btn-christmas {
     @apply bg-gradient-to-r from-primary to-secondary text-primary-foreground;
     @apply transition-all duration-300;
-    box-shadow: var(--shadow-christmas);
+    box-shadow: var(--shadow-button);
+    border-radius: var(--button-radius);
   }
 
   .btn-christmas:hover {
     box-shadow: var(--shadow-christmas);
+    transform: translateY(-1px);
+  }
+
+  .btn-christmas:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-button);
   }
 
   .btn-gold {
     @apply bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground;
     @apply transition-all duration-300;
+    border-radius: var(--button-radius);
   }
 
   .btn-gold:hover {
     box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+
+  .btn-gold:active {
+    transform: translateY(0);
   }
 
   /* Mobile touch targets */
@@ -113,9 +148,17 @@ All colors MUST be HSL for semantic theming.
     @apply p-[var(--touch-margin)];
   }
 
+  .touch-large {
+    @apply min-h-[64px] px-6 py-4 text-lg font-medium;
+  }
+
   /* Christmas animations */
   .pulse-christmas {
     animation: pulse-christmas 2s ease-in-out infinite;
+  }
+
+  .bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
   }
 
   .glow-effect {
@@ -132,6 +175,19 @@ All colors MUST be HSL for semantic theming.
 
   .shadow-card {
     box-shadow: var(--shadow-card);
+  }
+
+  .shadow-button {
+    box-shadow: var(--shadow-button);
+  }
+
+  /* Native-like transitions */
+  .transition-native {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .scale-tap {
+    @apply active:scale-95 transition-transform duration-100;
   }
 }
 
@@ -155,5 +211,14 @@ All colors MUST be HSL for semantic theming.
   }
   50% {
     box-shadow: 0 0 40px hsl(var(--primary-glow) / 0.8);
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
   }
 }

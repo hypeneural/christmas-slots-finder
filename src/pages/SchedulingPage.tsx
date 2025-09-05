@@ -77,12 +77,12 @@ export default function SchedulingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="app-container">
         <HeaderLogo />
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-16">
           <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-muted-foreground">{i18n.loading}</p>
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-lg text-muted-foreground">{i18n.loading}</p>
           </div>
         </div>
       </div>
@@ -91,10 +91,11 @@ export default function SchedulingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="app-container">
         <HeaderLogo />
-        <div className="text-center py-12 px-4">
-          <p className="text-destructive mb-4">{i18n.errorLoadingSlots}</p>
+        <div className="app-section text-center py-16">
+          <div className="text-4xl mb-4">😞</div>
+          <p className="text-lg text-destructive mb-2">{i18n.errorLoadingSlots}</p>
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
@@ -103,10 +104,11 @@ export default function SchedulingPage() {
 
   if (!packageMeta || !categorizedPaged) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="app-container">
         <HeaderLogo />
-        <div className="text-center py-12 px-4">
-          <p className="text-muted-foreground">{i18n.noSlotsAvailable}</p>
+        <div className="app-section text-center py-16">
+          <div className="text-4xl mb-4">📅</div>
+          <p className="text-lg text-muted-foreground">{i18n.noSlotsAvailable}</p>
         </div>
         <WhatsAppFAB />
       </div>
@@ -114,7 +116,7 @@ export default function SchedulingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="app-container">
       <HeaderLogo />
       
       <TopBanner packageSlug={packageSlug} onChangePackage={handleChangePackage} />

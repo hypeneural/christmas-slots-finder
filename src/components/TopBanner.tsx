@@ -13,21 +13,25 @@ export function TopBanner({ packageSlug, onChangePackage }: TopBannerProps) {
   }
 
   return (
-    <div className="mx-4 mb-6 p-4 rounded-lg bg-gradient-to-r from-secondary/20 to-accent/20 border border-secondary/30">
-      <div className="flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-        <div className="flex-1">
-          <p className="text-sm text-foreground leading-relaxed">
-            {i18n.premiumHoursBanner}
-          </p>
-          <Button
-            onClick={onChangePackage}
-            variant="outline"
-            size="sm"
-            className="mt-3 border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-          >
-            {i18n.changePackage}
-          </Button>
+    <div className="app-section">
+      <div className="app-card bg-gradient-to-r from-secondary/20 to-accent/20 border-secondary/30">
+        <div className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-2 rounded-full bg-accent/20 flex-shrink-0">
+              <AlertTriangle className="w-5 h-5 text-accent" />
+            </div>
+            <div className="flex-1">
+              <p className="text-base text-foreground leading-relaxed mb-4">
+                {i18n.premiumHoursBanner}
+              </p>
+              <Button
+                onClick={onChangePackage}
+                className="touch-large bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground font-bold shadow-button hover:shadow-glow active:scale-95 transition-all duration-200"
+              >
+                {i18n.changePackage}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

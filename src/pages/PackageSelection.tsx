@@ -56,12 +56,12 @@ export default function PackageSelection() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="app-container">
         <HeaderLogo />
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-16">
           <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-muted-foreground">{i18n.loading}</p>
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-lg text-muted-foreground">{i18n.loading}</p>
           </div>
         </div>
       </div>
@@ -69,15 +69,15 @@ export default function PackageSelection() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="app-container">
       <HeaderLogo />
       
-      <div className="px-4 pb-24">
+      <div className="app-section">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
+          <h2 className="text-3xl font-bold text-foreground mb-3">
             {i18n.selectPackage}
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-muted-foreground">
             Escolha seu pacote para ver os horários disponíveis
           </p>
         </div>
@@ -86,22 +86,22 @@ export default function PackageSelection() {
           {packages.map((pkg) => (
             <Card
               key={pkg.slug}
-              className={`cursor-pointer transition-all duration-300 ${
+              className={`cursor-pointer transition-all duration-300 scale-tap ${
                 selectedPackage === pkg.slug
-                  ? 'ring-2 ring-primary shadow-christmas bg-card'
-                  : 'hover:shadow-lg bg-card/50 backdrop-blur'
+                  ? 'ring-2 ring-primary shadow-christmas app-card bg-primary/5'
+                  : 'hover:shadow-lg app-card hover:bg-primary/2'
               }`}
               onClick={() => setSelectedPackage(pkg.slug)}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg text-foreground">
+                  <CardTitle className="text-xl text-foreground font-bold">
                     {pkg.name}
                   </CardTitle>
                   {pkg.badges && pkg.badges.length > 0 && (
                     <Badge
                       variant="secondary"
-                      className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground text-xs"
+                      className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground text-xs font-bold shadow-button"
                     >
                       {pkg.badges[0]}
                     </Badge>
@@ -110,9 +110,11 @@ export default function PackageSelection() {
               </CardHeader>
               
               <CardContent>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span className="text-sm">
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <div className="p-2 rounded-full bg-primary/20">
+                    <Clock className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-base font-medium">
                     {i18n.duration(pkg.durationMinutes)}
                   </span>
                 </div>
@@ -125,8 +127,7 @@ export default function PackageSelection() {
           <div className="max-w-md mx-auto mt-8">
             <Button
               onClick={handleViewSlots}
-              className="w-full touch-target bg-gradient-to-r from-primary to-secondary text-primary-foreground font-medium shadow-christmas hover:shadow-glow"
-              size="lg"
+              className="w-full touch-large bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold shadow-button hover:shadow-christmas scale-tap"
             >
               {i18n.viewAvailableSlots}
             </Button>
@@ -135,24 +136,24 @@ export default function PackageSelection() {
       </div>
 
       {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur border-t border-border p-4">
-        <div className="flex gap-3 max-w-md mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border/50 p-6 safe-area-pb">
+        <div className="flex gap-4 max-w-md mx-auto">
           <Button
             onClick={handleViewPackages}
             variant="outline"
-            className="flex-1 touch-target border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            className="flex-1 touch-large border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold scale-tap"
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
+            <ExternalLink className="w-5 h-5 mr-2" />
             Ver os pacotes
           </Button>
           
           <Button
             onClick={handleWhatsApp}
             variant="outline"
-            className="flex-1 touch-target border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground"
+            className="flex-1 touch-large border-2 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-bold scale-tap"
           >
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Dúvidas? WhatsApp
+            <MessageCircle className="w-5 h-5 mr-2" />
+            Dúvidas?
           </Button>
         </div>
       </div>
