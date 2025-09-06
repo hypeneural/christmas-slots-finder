@@ -82,14 +82,14 @@ export default function PackageSelection() {
           </p>
         </div>
 
-        <div className="space-y-4 max-w-md mx-auto">
+        <div className="space-y-4 max-w-md mx-auto pb-32">
           {packages.map((pkg) => (
             <Card
               key={pkg.slug}
               className={`cursor-pointer transition-all duration-300 scale-tap ${
                 selectedPackage === pkg.slug
-                  ? 'ring-2 ring-primary shadow-christmas app-card bg-primary/5'
-                  : 'hover:shadow-lg app-card hover:bg-primary/2'
+                  ? 'ring-2 ring-primary shadow-christmas app-card bg-primary/5 border-primary/30'
+                  : 'hover:shadow-lg app-card hover:bg-primary/2 border-border hover:border-primary/20'
               }`}
               onClick={() => setSelectedPackage(pkg.slug)}
             >
@@ -123,38 +123,41 @@ export default function PackageSelection() {
           ))}
         </div>
 
-        {selectedPackage && (
-          <div className="max-w-md mx-auto mt-8">
-            <Button
-              onClick={handleViewSlots}
-              className="w-full touch-large bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold shadow-button hover:shadow-christmas scale-tap"
-            >
-              {i18n.viewAvailableSlots}
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border/50 p-6 safe-area-pb">
-        <div className="flex gap-4 max-w-md mx-auto">
-          <Button
-            onClick={handleViewPackages}
-            variant="outline"
-            className="flex-1 touch-large border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold scale-tap"
-          >
-            <ExternalLink className="w-5 h-5 mr-2" />
-            Ver os pacotes
-          </Button>
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border/50 safe-area-pb">
+        <div className="p-4 max-w-md mx-auto space-y-3">
+          {/* Main CTA Button - Only show when package is selected */}
+          {selectedPackage && (
+            <Button
+              onClick={handleViewSlots}
+              className="w-full touch-large bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold text-lg shadow-button hover:shadow-christmas scale-tap pulse-christmas"
+            >
+              {i18n.viewAvailableSlots}
+            </Button>
+          )}
           
-          <Button
-            onClick={handleWhatsApp}
-            variant="outline"
-            className="flex-1 touch-large border-2 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-bold scale-tap"
-          >
-            <MessageCircle className="w-5 h-5 mr-2" />
-            Dúvidas?
-          </Button>
+          {/* Secondary buttons */}
+          <div className="flex gap-3">
+            <Button
+              onClick={handleViewPackages}
+              variant="outline"
+              className="flex-1 touch-large border-2 border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground font-semibold scale-tap"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Ver os pacotes
+            </Button>
+            
+            <Button
+              onClick={handleWhatsApp}
+              variant="outline"
+              className="flex-1 touch-large border-2 border-secondary/50 text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold scale-tap"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Dúvidas?
+            </Button>
+          </div>
         </div>
       </div>
     </div>
