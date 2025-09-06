@@ -126,17 +126,22 @@ export default function PackageSelection() {
       </div>
 
       {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border/50 safe-area-pb">
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border/50 safe-area-pb shadow-xl">
         <div className="p-4 max-w-md mx-auto space-y-3">
           {/* Main CTA Button - Only show when package is selected */}
-          {selectedPackage && (
-            <Button
-              onClick={handleViewSlots}
-              className="w-full touch-large bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold text-lg shadow-button hover:shadow-christmas scale-tap pulse-christmas"
-            >
-              {i18n.viewAvailableSlots}
-            </Button>
-          )}
+          <div className={`transition-all duration-500 ${selectedPackage ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+            {selectedPackage && (
+              <Button
+                onClick={handleViewSlots}
+                className="w-full touch-large bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold text-lg shadow-christmas hover:shadow-glow scale-tap pulse-christmas animate-fade-in relative overflow-hidden"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  🎄 {i18n.viewAvailableSlots} 🎄
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+              </Button>
+            )}
+          </div>
           
           {/* Secondary buttons */}
           <div className="flex gap-3">

@@ -57,10 +57,10 @@ export function PaymentDialog({ open, onOpenChange }: PaymentDialogProps) {
       if (!isOpen) setTimerActive(false);
       onOpenChange(isOpen);
     }}>
-      <DialogContent className="sm:max-w-md mx-4 app-card border-border/50">
+      <DialogContent className="sm:max-w-md mx-4 app-card border-border/50 animate-scale-in shadow-2xl backdrop-blur-sm">
         <DialogHeader className="text-center space-y-4">
-          <div className="mx-auto p-4 rounded-full bg-accent/20">
-            <CreditCard className="w-8 h-8 text-accent" />
+          <div className="mx-auto p-4 rounded-full bg-gradient-to-br from-accent/30 to-yellow-400/30 shadow-glow pulse-christmas">
+            <CreditCard className="w-8 h-8 text-accent animate-pulse" />
           </div>
           
           <DialogTitle className="text-2xl font-bold text-foreground">
@@ -68,10 +68,12 @@ export function PaymentDialog({ open, onOpenChange }: PaymentDialogProps) {
           </DialogTitle>
           
           {timerActive && (
-            <div className="flex items-center justify-center gap-3 py-3 bg-accent/10 rounded-lg border border-accent/20">
-              <Timer className="w-5 h-5 text-accent animate-pulse" />
-              <span className="text-lg font-bold text-accent">
-                {i18n.redirectingIn(countdown)}
+            <div className="flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-accent/20 to-yellow-400/20 rounded-xl border-2 border-accent/30 shadow-inner animate-pulse">
+              <div className="p-1.5 rounded-full bg-accent/30">
+                <Timer className="w-5 h-5 text-accent animate-spin" />
+              </div>
+              <span className="text-lg font-bold text-accent animate-bounce">
+                ⏰ {i18n.redirectingIn(countdown)}
               </span>
             </div>
           )}
@@ -87,19 +89,20 @@ export function PaymentDialog({ open, onOpenChange }: PaymentDialogProps) {
         <DialogFooter className="flex flex-col gap-4 sm:flex-col mt-6">
           <Button
             onClick={handlePayNow}
-            className="w-full touch-large bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground font-bold shadow-glow hover:shadow-christmas scale-tap"
+            className="w-full touch-large bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground font-bold shadow-glow hover:shadow-christmas scale-tap pulse-christmas relative overflow-hidden group"
           >
-            <CreditCard className="w-5 h-5 mr-2" />
-            {i18n.payNow}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <CreditCard className="w-5 h-5 mr-2 relative z-10" />
+            <span className="relative z-10">💳 {i18n.payNow}</span>
           </Button>
           
           <Button
             onClick={handleWhatsApp}
             variant="outline"
-            className="w-full touch-large border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold scale-tap"
+            className="w-full touch-large border-2 border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground font-bold scale-tap shadow-button hover:shadow-glow hover:border-primary transition-all duration-300"
           >
             <MessageCircle className="w-5 h-5 mr-2" />
-            {i18n.whatsappContact}
+            💬 {i18n.whatsappContact}
           </Button>
         </DialogFooter>
       </DialogContent>
