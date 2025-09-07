@@ -1,3 +1,8 @@
+// Mobile-first filter types
+export type DayCode = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat';
+export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'after18';
+export type CategoryKey = 'all' | 'afterHours' | 'saturdays' | 'sundaysHolidays';
+
 export interface Package {
   id: number;
   slug: string;
@@ -6,17 +11,16 @@ export interface Package {
   badges?: string[];
 }
 
+export interface Holiday { 
+  name: string; 
+  times: string[]; 
+}
+export type Holidays = Record<string, Holiday>;
+
 export interface BusyEvent {
   start: string; // ISO datetime with timezone
   end: string;   // ISO datetime with timezone
-  summary: string;
-}
-
-export interface Holidays {
-  [date: string]: {
-    name: string;
-    times: string[];
-  };
+  summary?: string;
 }
 
 export interface WeekAvailability {
@@ -39,12 +43,30 @@ export interface Availability {
   weekAvailability: WeekAvailability;
   specificDateAvailability?: Record<string, string[]>; // YYYY-MM-DD -> times
   holidays?: Holidays;
-  busyEvents: BusyEvent[];
+  busyEvents?: BusyEvent[];
 }
 
 export interface AvailabilityData {
   packages: Package[];
   availability: Availability;
+}
+
+export interface AvailabilityInput {
+  packages: Package[];
+  availability: Availability;
+}
+
+// Mobile filters interface
+export interface Filters {
+  dateFrom?: string;          // YYYY-MM-DD
+  dateTo?: string;            // YYYY-MM-DD
+  daysOfWeek?: DayCode[];     // multi-select
+  onlyWeekends?: boolean;
+  timeOfDay?: TimeOfDay[];    // ['morning','after18'] etc.
+  timeRange?: [string, string]; // ['HH:mm','HH:mm']
+  onlyAfter18?: boolean;      // atalho
+  exactTime?: string;         // HH:mm
+  minSlotsPerDate?: number;   // ex.: 2
 }
 
 // Processed data types
@@ -78,9 +100,28 @@ export interface CategorizedPaged {
   };
 }
 
-export type CategoryKey = keyof Categorized;
+// Mobile UI types
+export type HapticKind = 'light' | 'medium' | 'heavy' | 'success' | 'warning';
 
-export interface AvailabilityInput {
-  availability: Availability;
-  timezone: string;
+export interface UIFlags {
+  safeAreaTop: number;    // em px — lidos de CSS env() quando disponível
+  safeAreaBottom: number; // em px
+  sheetOpen: boolean;
+  haptic?: HapticKind;    // dispara vibrate curto ao mudar
+}
+
+export interface RouteParams {
+  packageSlug?: string;
+  page?: number;          // via query param
+}
+
+export interface FiltersURLState {
+  df?: string; dt?: string;      // dateFrom/dateTo
+  dow?: string;                  // 'mon,tue,wed'
+  wknd?: '0'|'1';
+  tod?: string;                  // 'morning,after18'
+  tr?: string;                   // '08:00-12:00'
+  a18?: '0'|'1';
+  xt?: string;                   // exact time
+  min?: string;                  // number
 }

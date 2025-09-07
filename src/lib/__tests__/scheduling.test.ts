@@ -18,6 +18,14 @@ describe('scheduling utilities', () => {
 
   describe('buildAvailableSlots', () => {
     const mockInput: AvailabilityInput = {
+      packages: [
+        {
+          id: 1,
+          slug: 'test-package',
+          name: 'Test Package',
+          durationMinutes: 30
+        }
+      ],
       availability: {
         packageId: 1,
         startDate: '2025-01-15',
@@ -34,8 +42,7 @@ describe('scheduling utilities', () => {
           Sunday: ['08:00', '09:00']
         },
         busyEvents: []
-      },
-      timezone: 'America/Sao_Paulo'
+      }
     };
 
     it('should build available slots for future dates', () => {
@@ -45,7 +52,7 @@ describe('scheduling utilities', () => {
     });
 
     it('should filter out past dates', () => {
-      const pastInput = {
+      const pastInput: AvailabilityInput = {
         ...mockInput,
         availability: {
           ...mockInput.availability,

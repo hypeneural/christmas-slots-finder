@@ -9,7 +9,10 @@ import { CategoryTabs } from '../components/CategoryTabs';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PaymentDialog } from '../components/PaymentDialog';
 import { WhatsAppFAB } from '../components/WhatsAppFAB';
+import { FiltersBar } from '../components/FiltersBar';
+import { FiltersSheet } from '../components/FiltersSheet';
 import { useAvailability } from '../hooks/useAvailability';
+import { useFilters } from '../hooks/useFilters';
 import { buildWhatsAppDeepLink } from '../lib/scheduling';
 import { i18n } from '../lib/i18n';
 import type { CategoryKey } from '../types';
@@ -21,9 +24,23 @@ export default function SchedulingPage() {
   
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   
+  // Filters state
+  const {
+    filters,
+    setFilters,
+    clearFilters,
+    activeCount,
+    hasActiveFilters,
+    isSheetOpen,
+    openSheet,
+    closeSheet
+  } = useFilters();
+  
   const { categorizedPaged, loading, error, packageMeta } = useAvailability(
     packageSlug,
-    currentPage
+    currentPage,
+    30, // perPage - increased for mobile
+    filters
   );
   
   const [selectedSlot, setSelectedSlot] = useState<{
@@ -123,10 +140,26 @@ export default function SchedulingPage() {
       
       <PackageInfo package={packageMeta} />
       
+      <FiltersBar
+        filters={filters}
+        activeCount={activeCount}
+        hasActiveFilters={hasActiveFilters}
+        onOpenFilters={openSheet}
+        onClearFilters={clearFilters}
+      />
+      
       <CategoryTabs
         categorizedPaged={categorizedPaged}
         onSlotClick={handleSlotClick}
         onPageChange={handlePageChange}
+      />
+      
+      <FiltersSheet
+        open={isSheetOpen}
+        onOpenChange={closeSheet}
+        filters={filters}
+        onApplyFilters={setFilters}
+        onClearFilters={clearFilters}
       />
       
       <WhatsAppFAB />

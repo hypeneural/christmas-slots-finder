@@ -1,6 +1,8 @@
-import { format, parseISO, startOfDay, addHours, addMinutes, isAfter, isBefore, isEqual } from 'date-fns';
-import { toZonedTime, fromZonedTime } from 'date-fns-tz';
-import type { AvailabilityInput, Categorized, CategorizedPaged, Holidays } from '../types';
+import { format, parseISO, isAfter, isBefore, isWeekend, getDay, addMinutes, addHours, startOfDay } from 'date-fns';
+import { fromZonedTime, toZonedTime, formatInTimeZone } from 'date-fns-tz';
+import { ptBR } from 'date-fns/locale';
+import type { AvailabilityInput, Categorized, CategorizedPaged, Holidays, Filters } from '../types';
+import { applyFilters } from './filters';
 
 /**
  * Get Portuguese day of week abbreviation
@@ -19,11 +21,12 @@ export function getDayOfWeekPt(day: string): string {
 }
 
 /**
- * Build available time slots for each date
+ * Build available time slots based on availability configuration with optional filters
  */
 export function buildAvailableSlots(
   input: AvailabilityInput,
-  tz: string = 'America/Sao_Paulo'
+  tz: string = 'America/Sao_Paulo',
+  filters?: Filters
 ): Record<string, string[]> {
   const { availability } = input;
   const now = toZonedTime(new Date(), tz);
@@ -91,6 +94,11 @@ export function buildAvailableSlots(
     currentDate = addHours(startOfDay(currentDate), 24);
   }
   
+  // Apply filters if provided
+  if (filters) {
+    return applyFilters(slots, filters, tz);
+  }
+
   return slots;
 }
 

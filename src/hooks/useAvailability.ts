@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchAvailability } from '../services/api';
 import { buildAvailableSlots, categorizeSlots, paginateDates } from '../lib/scheduling';
-import type { CategorizedPaged, Package, AvailabilityData } from '../types';
+import type { CategorizedPaged, Package, AvailabilityData, Filters } from '../types';
 
 interface UseAvailabilityResult {
   categorizedPaged: CategorizedPaged | null;
@@ -14,7 +14,8 @@ interface UseAvailabilityResult {
 export function useAvailability(
   packageSlug: string | undefined,
   page: number = 1,
-  perPage: number = 10
+  perPage: number = 10,
+  filters?: Filters
 ): UseAvailabilityResult {
   const [categorizedPaged, setCategorizedPaged] = useState<CategorizedPaged | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,10 +35,11 @@ export function useAvailability(
       const pkg = data.packages.find(p => p.slug === packageSlug);
       setPackageMeta(pkg || null);
 
-      // Process availability data
+      // Process availability data with filters
       const availableSlots = buildAvailableSlots(
-        { availability: data.availability, timezone: 'America/Sao_Paulo' },
-        'America/Sao_Paulo'
+        { packages: data.packages, availability: data.availability },
+        'America/Sao_Paulo',
+        filters
       );
 
       const categorized = categorizeSlots(
@@ -59,7 +61,7 @@ export function useAvailability(
 
   useEffect(() => {
     loadAvailability();
-  }, [packageSlug, page, perPage]);
+  }, [packageSlug, page, perPage, filters]);
 
   return {
     categorizedPaged,

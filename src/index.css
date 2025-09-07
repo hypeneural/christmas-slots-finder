@@ -52,15 +52,21 @@ All colors MUST be HSL for semantic theming.
     --shadow-card: 0 8px 25px -5px hsl(355 25% 3% / 0.6);
     --shadow-button: 0 4px 15px -2px hsl(var(--primary) / 0.3);
 
-    /* Mobile Touch Targets */
-    --touch-target: 56px;
-    --touch-margin: 16px;
-    
-    /* Native App Spacing */
-    --app-padding: 20px;
-    --section-gap: 24px;
-    --card-radius: 16px;
-    --button-radius: 12px;
+  /* Mobile Touch Targets */
+  --touch-target: 56px;
+  --touch-margin: 16px;
+  
+  /* Native App Spacing */
+  --app-padding: 20px;
+  --section-gap: 24px;
+  --card-radius: 16px;
+  --button-radius: 12px;
+
+  /* Safe Area Support */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
 
     --radius: 12px;
 
@@ -180,6 +186,33 @@ All colors MUST be HSL for semantic theming.
 
   .scale-tap {
     @apply active:scale-95 transition-transform duration-100;
+  }
+
+  /* Safe Area Classes */
+  .safe-area-top {
+    padding-top: var(--safe-area-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: var(--safe-area-bottom);
+  }
+
+  .safe-area-left {
+    padding-left: var(--safe-area-left);
+  }
+
+  .safe-area-right {
+    padding-right: var(--safe-area-right);
+  }
+
+  /* Scrollbar Hide */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
