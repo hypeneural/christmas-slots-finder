@@ -82,13 +82,13 @@ export default function PackageSelection() {
           </p>
         </div>
 
-        <div className="space-y-4 max-w-md mx-auto pb-32">
+        <div className="space-y-4 max-w-md mx-auto pb-40">
           {packages.map((pkg) => (
             <Card
               key={pkg.slug}
-              className={`cursor-pointer transition-all duration-300 scale-tap ${
+              className={`cursor-pointer transition-all duration-300 active:scale-98 ${
                 selectedPackage === pkg.slug
-                  ? 'ring-2 ring-primary shadow-christmas app-card bg-primary/5 border-primary/30'
+                  ? 'ring-2 ring-primary shadow-christmas app-card bg-primary/5 border-primary/30 scale-[1.02]'
                   : 'hover:shadow-lg app-card hover:bg-primary/2 border-border hover:border-primary/20'
               }`}
               onClick={() => setSelectedPackage(pkg.slug)}
@@ -109,7 +109,7 @@ export default function PackageSelection() {
                 </div>
               </CardHeader>
               
-              <CardContent>
+              <CardContent className="pb-6">
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <div className="p-2 rounded-full bg-primary/20">
                     <Clock className="w-4 h-4 text-primary" />
@@ -118,6 +118,12 @@ export default function PackageSelection() {
                     {i18n.duration(pkg.durationMinutes)}
                   </span>
                 </div>
+                
+                {selectedPackage === pkg.slug && (
+                  <div className="mt-4 flex items-center justify-center">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce-subtle"></div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -125,20 +131,23 @@ export default function PackageSelection() {
 
       </div>
 
-      {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border/50 safe-area-pb shadow-xl">
+      {/* Fixed Footer with Safe Area */}
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border/50 shadow-xl" style={{ paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}>
         <div className="p-4 max-w-md mx-auto space-y-3">
           {/* Main CTA Button - Only show when package is selected */}
-          <div className={`transition-all duration-500 ${selectedPackage ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+          <div className={`transition-all duration-700 ease-out ${selectedPackage ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-6 scale-95 pointer-events-none'}`}>
             {selectedPackage && (
               <Button
                 onClick={handleViewSlots}
-                className="w-full touch-large bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold text-lg shadow-christmas hover:shadow-glow scale-tap pulse-christmas animate-fade-in relative overflow-hidden"
+                className="w-full h-14 bg-gradient-to-r from-primary via-primary to-secondary text-primary-foreground font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group animate-pulse-gentle"
               >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  🎄 {i18n.viewAvailableSlots} 🎄
+                <span className="relative z-10 flex items-center justify-center gap-3">
+                  <span className="text-xl">🎄</span>
+                  <span>{i18n.viewAvailableSlots}</span>
+                  <span className="text-xl">🎄</span>
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               </Button>
             )}
           </div>
@@ -148,19 +157,19 @@ export default function PackageSelection() {
             <Button
               onClick={handleViewPackages}
               variant="outline"
-              className="flex-1 touch-large border-2 border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground font-semibold scale-tap"
+              className="flex-1 h-12 border-2 border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 font-semibold transition-all duration-200 active:scale-95"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              Ver os pacotes
+              <span className="text-sm">Ver pacotes</span>
             </Button>
             
             <Button
               onClick={handleWhatsApp}
               variant="outline"
-              className="flex-1 touch-large border-2 border-secondary/50 text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold scale-tap"
+              className="flex-1 h-12 border-2 border-secondary/30 text-secondary hover:bg-secondary/10 hover:border-secondary/50 font-semibold transition-all duration-200 active:scale-95"
             >
               <MessageCircle className="w-4 h-4 mr-2" />
-              Dúvidas?
+              <span className="text-sm">Dúvidas?</span>
             </Button>
           </div>
         </div>
