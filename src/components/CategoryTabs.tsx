@@ -9,10 +9,10 @@ interface CategoryTabsProps {
   categorizedPaged: CategorizedPaged;
   onSlotClick: (date: string, time: string) => void;
   onLoadMore: (category: CategoryKey) => void;
-  loadingMore?: boolean;
+  loadingMore: boolean;
 }
 
-export function CategoryTabs({ categorizedPaged, onSlotClick, onLoadMore, loadingMore = false }: CategoryTabsProps) {
+export function CategoryTabs({ categorizedPaged, onSlotClick, onLoadMore, loadingMore }: CategoryTabsProps) {
   const categories = [
     { key: 'all' as CategoryKey, label: i18n.all, icon: Calendar },
     { key: 'afterHours' as CategoryKey, label: i18n.afterHours, icon: Moon },

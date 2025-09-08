@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { HeaderLogo } from '../components/HeaderLogo';
@@ -11,7 +11,7 @@ import { PaymentDialog } from '../components/PaymentDialog';
 import { WhatsAppFAB } from '../components/WhatsAppFAB';
 import { FiltersBar } from '../components/FiltersBar';
 import { FiltersSheet } from '../components/FiltersSheet';
-import { useAvailability } from '../hooks/useAvailability';
+import { useInfiniteAvailability } from '../hooks/useInfiniteAvailability';
 import { useFilters } from '../hooks/useFilters';
 import { buildWhatsAppDeepLink } from '../lib/scheduling';
 import { i18n } from '../lib/i18n';
@@ -21,9 +21,6 @@ import type { CategoryKey } from '../types';
 export default function SchedulingPage() {
   const { packageSlug } = useParams<{ packageSlug: string }>();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  
-  const currentPage = parseInt(searchParams.get('page') || '1', 10);
   
   // Filters state
   const {
@@ -37,9 +34,15 @@ export default function SchedulingPage() {
     closeSheet
   } = useFilters();
   
-  const { categorizedPaged, loading, error, packageMeta } = useAvailability(
+  const { 
+    categorizedPaged, 
+    loading, 
+    loadingMore,
+    error, 
+    packageMeta, 
+    loadMore 
+  } = useInfiniteAvailability(
     packageSlug,
-    currentPage,
     30, // perPage - increased for mobile
     filters
   );
@@ -53,7 +56,6 @@ export default function SchedulingPage() {
   
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
 
   const handleSlotClick = (date: string, time: string) => {
     const parsedDate = parseISO(date);
@@ -82,18 +84,7 @@ export default function SchedulingPage() {
   };
 
   const handleLoadMore = async (category: CategoryKey) => {
-    if (loadingMore || !categorizedPaged) return;
-    
-    const categoryData = categorizedPaged[category];
-    const nextPage = categoryData.currentPage + 1;
-    
-    if (nextPage <= categoryData.totalPages) {
-      setLoadingMore(true);
-      setSearchParams({ page: nextPage.toString() });
-      
-      // Simulate loading delay for better UX
-      setTimeout(() => setLoadingMore(false), 500);
-    }
+    await loadMore(category);
   };
 
   const handleChangePackage = () => {
