@@ -20,12 +20,6 @@ export default function PackageSelection() {
       try {
         const data = await fetchPackages();
         setPackages(data);
-        
-        // Try to load last selected package from localStorage
-        const lastSelected = localStorage.getItem('lastSelectedPackage');
-        if (lastSelected && data.some(pkg => pkg.slug === lastSelected)) {
-          setSelectedPackage(lastSelected);
-        }
       } catch (error) {
         console.error('Error loading packages:', error);
       } finally {
