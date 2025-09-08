@@ -15,6 +15,7 @@ import { useAvailability } from '../hooks/useAvailability';
 import { useFilters } from '../hooks/useFilters';
 import { buildWhatsAppDeepLink } from '../lib/scheduling';
 import { i18n } from '../lib/i18n';
+import { Loader2, Frown, CalendarX } from 'lucide-react';
 import type { CategoryKey } from '../types';
 
 export default function SchedulingPage() {
@@ -52,6 +53,7 @@ export default function SchedulingPage() {
   
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const handleSlotClick = (date: string, time: string) => {
     const parsedDate = parseISO(date);
@@ -79,8 +81,19 @@ export default function SchedulingPage() {
     setShowPaymentDialog(true);
   };
 
-  const handlePageChange = (category: CategoryKey, page: number) => {
-    setSearchParams({ page: page.toString() });
+  const handleLoadMore = async (category: CategoryKey) => {
+    if (loadingMore || !categorizedPaged) return;
+    
+    const categoryData = categorizedPaged[category];
+    const nextPage = categoryData.currentPage + 1;
+    
+    if (nextPage <= categoryData.totalPages) {
+      setLoadingMore(true);
+      setSearchParams({ page: nextPage.toString() });
+      
+      // Simulate loading delay for better UX
+      setTimeout(() => setLoadingMore(false), 500);
+    }
   };
 
   const handleChangePackage = () => {
@@ -98,7 +111,9 @@ export default function SchedulingPage() {
         <HeaderLogo />
         <div className="flex items-center justify-center py-16">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="p-4 rounded-full bg-primary/10 w-fit mx-auto mb-4">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            </div>
             <p className="text-lg text-muted-foreground">{i18n.loading}</p>
           </div>
         </div>
@@ -111,7 +126,9 @@ export default function SchedulingPage() {
       <div className="app-container">
         <HeaderLogo />
         <div className="app-section text-center py-16">
-          <div className="text-4xl mb-4">😞</div>
+          <div className="p-4 rounded-full bg-destructive/10 w-fit mx-auto mb-4">
+            <Frown className="w-8 h-8 text-destructive" />
+          </div>
           <p className="text-lg text-destructive mb-2">{i18n.errorLoadingSlots}</p>
           <p className="text-muted-foreground">{error}</p>
         </div>
@@ -124,7 +141,9 @@ export default function SchedulingPage() {
       <div className="app-container">
         <HeaderLogo />
         <div className="app-section text-center py-16">
-          <div className="text-4xl mb-4">📅</div>
+          <div className="p-4 rounded-full bg-muted/20 w-fit mx-auto mb-4">
+            <CalendarX className="w-8 h-8 text-muted-foreground" />
+          </div>
           <p className="text-lg text-muted-foreground">{i18n.noSlotsAvailable}</p>
         </div>
         <WhatsAppFAB />
@@ -151,7 +170,8 @@ export default function SchedulingPage() {
       <CategoryTabs
         categorizedPaged={categorizedPaged}
         onSlotClick={handleSlotClick}
-        onPageChange={handlePageChange}
+        onLoadMore={handleLoadMore}
+        loadingMore={loadingMore}
       />
       
       <FiltersSheet

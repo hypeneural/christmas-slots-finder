@@ -2,7 +2,7 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { SlotButton } from './SlotButton';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, CalendarX } from 'lucide-react';
 
 interface DateAccordionProps {
   slots: Record<string, string[]>;
@@ -15,7 +15,9 @@ export function DateAccordion({ slots, onSlotClick }: DateAccordionProps) {
   if (sortedDates.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        <div className="text-4xl mb-4">📅</div>
+        <div className="p-4 rounded-full bg-muted/20 w-fit mx-auto mb-4">
+          <CalendarX className="w-8 h-8" />
+        </div>
         <p className="text-lg">Nenhum horário disponível</p>
       </div>
     );
