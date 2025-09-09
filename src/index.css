@@ -96,7 +96,10 @@ All colors MUST be HSL for semantic theming.
 @layer components {
   /* Native App Styles */
   .app-container {
-    @apply min-h-screen bg-background pb-24;
+    @apply min-h-screen bg-background pb-24 relative overflow-hidden;
+    /* Mobile native app feel */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
 
   .app-section {
@@ -200,6 +203,50 @@ All colors MUST be HSL for semantic theming.
     transform: scale(0.98);
   }
 
+  /* Mobile native improvements */
+  .native-button {
+    @apply relative overflow-hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .native-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+
+  .native-button:active::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .glass-card {
+    @apply bg-card/20 backdrop-blur-xl border border-white/10;
+    box-shadow: 
+      0 8px 32px 0 rgba(31, 38, 135, 0.37),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .shimmer-effect {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
   /* Safe Area Classes */
   .safe-area-top {
     padding-top: var(--safe-area-top);
@@ -268,5 +315,32 @@ All colors MUST be HSL for semantic theming.
   50% {
     transform: scale(1.015);
     box-shadow: 0 8px 30px -2px hsl(var(--primary) / 0.35);
+  }
+}
+
+@keyframes snowfall {
+  0% {
+    transform: translateY(-100vh) translateX(0px);
+  }
+  100% {
+    transform: translateY(100vh) translateX(100px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
