@@ -22,58 +22,57 @@ export function FiltersBar({
   const summary = getFilterSummary(filters);
 
   return (
-    <div 
-      className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50 safe-area-top"
-      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-    >
-      <div className="app-section py-3">
-        <div className="flex items-center gap-3">
-          {/* Filter Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onOpenFilters}
-            className="touch-target flex-shrink-0 relative"
+    <div className="flex items-center gap-2 w-full">
+      {/* Filter Button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onOpenFilters}
+        className="touch-target flex-shrink-0 relative h-10"
+      >
+        <Filter className="w-4 h-4" />
+        <span className="hidden sm:inline ml-1">Filtros</span>
+        {activeCount > 0 && (
+          <Badge 
+            variant="secondary" 
+            className="ml-1 h-4 w-4 p-0 text-xs bg-primary text-primary-foreground"
           >
-            <Filter className="w-4 h-4" />
-            Filtros
-            {activeCount > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-2 h-5 w-5 p-0 text-xs bg-primary text-primary-foreground"
-              >
-                {activeCount}
-              </Badge>
-            )}
-          </Button>
+            {activeCount}
+          </Badge>
+        )}
+      </Button>
 
-          {/* Summary Chips */}
-          <div className="flex-1 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-            {summary.map((chip, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className="flex-shrink-0 bg-muted/50 text-muted-foreground border-border/50"
-              >
-                {chip}
-              </Badge>
-            ))}
-          </div>
-
-          {/* Clear Button */}
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClearFilters}
-              className="touch-target flex-shrink-0 text-muted-foreground hover:text-destructive"
+      {/* Summary Chips - Mobile friendly */}
+      {summary.length > 0 && (
+        <div className="flex-1 flex items-center gap-1 overflow-x-auto scrollbar-hide">
+          {summary.slice(0, 2).map((chip, index) => (
+            <Badge
+              key={index}
+              variant="secondary"
+              className="flex-shrink-0 bg-muted/30 text-muted-foreground border-0 text-xs px-2 py-1"
             >
-              <X className="w-4 h-4" />
-              <span className="hidden sm:inline ml-1">Limpar</span>
-            </Button>
+              {chip}
+            </Badge>
+          ))}
+          {summary.length > 2 && (
+            <Badge variant="secondary" className="flex-shrink-0 bg-muted/30 text-muted-foreground border-0 text-xs px-2 py-1">
+              +{summary.length - 2}
+            </Badge>
           )}
         </div>
-      </div>
+      )}
+
+      {/* Clear Button */}
+      {hasActiveFilters && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClearFilters}
+          className="touch-target flex-shrink-0 text-muted-foreground hover:text-destructive h-10 w-10 p-0"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      )}
     </div>
   );
 }

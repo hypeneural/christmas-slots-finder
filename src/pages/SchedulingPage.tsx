@@ -5,11 +5,12 @@ import { ptBR } from 'date-fns/locale';
 import { HeaderLogo } from '../components/HeaderLogo';
 import { TopBanner } from '../components/TopBanner';
 import { PackageInfo } from '../components/PackageInfo';
-import { CategoryTabs } from '../components/CategoryTabs';
+import { CompactControls } from '../components/CompactControls';
+import { DateAccordion } from '../components/DateAccordion';
+import { InfiniteScrollContainer } from '../components/InfiniteScrollContainer';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PaymentDialog } from '../components/PaymentDialog';
 import { WhatsAppFAB } from '../components/WhatsAppFAB';
-import { FiltersBar } from '../components/FiltersBar';
 import { FiltersSheet } from '../components/FiltersSheet';
 import { useInfiniteAvailability } from '../hooks/useInfiniteAvailability';
 import { useFilters } from '../hooks/useFilters';
@@ -33,6 +34,9 @@ export default function SchedulingPage() {
     openSheet,
     closeSheet
   } = useFilters();
+  
+  // State for selected category
+  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>('all');
   
   const { 
     categorizedPaged, 
@@ -150,20 +154,37 @@ export default function SchedulingPage() {
       
       <PackageInfo package={packageMeta} />
       
-      <FiltersBar
+      <CompactControls
+        categorizedPaged={categorizedPaged}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
         filters={filters}
-        activeCount={activeCount}
+        activeFiltersCount={activeCount}
         hasActiveFilters={hasActiveFilters}
         onOpenFilters={openSheet}
         onClearFilters={clearFilters}
       />
       
-      <CategoryTabs
-        categorizedPaged={categorizedPaged}
-        onSlotClick={handleSlotClick}
-        onLoadMore={handleLoadMore}
-        loadingMore={loadingMore}
-      />
+      <div className="app-section">
+        {(() => {
+          const categoryData = categorizedPaged[selectedCategory];
+          const hasMore = categoryData.currentPage < categoryData.totalPages;
+          
+          return (
+            <InfiniteScrollContainer
+              hasMore={hasMore}
+              loading={loadingMore}
+              onLoadMore={() => handleLoadMore(selectedCategory)}
+              threshold={300}
+            >
+              <DateAccordion
+                slots={categoryData.slots}
+                onSlotClick={handleSlotClick}
+              />
+            </InfiniteScrollContainer>
+          );
+        })()}
+      </div>
       
       <FiltersSheet
         open={isSheetOpen}
