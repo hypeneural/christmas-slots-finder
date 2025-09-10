@@ -5,17 +5,17 @@ export function HeaderLogo() {
   return (
     <header className="relative overflow-hidden safe-area-top">
       <div 
-        className="h-32 sm:h-28 bg-cover bg-center bg-no-repeat"
+        className="h-36 sm:h-32 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/60 to-background/85 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/50 to-background/80 backdrop-blur-[2px]"></div>
       </div>
       
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-center px-4">
+        <div className="flex flex-col items-center gap-4 text-center px-4">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-accent rounded-full blur-xl opacity-70 pulse-christmas"></div>
-            <div className="relative p-4 rounded-full glass-card shadow-glow transition-native hover:scale-105 active:scale-95">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-accent rounded-2xl blur-2xl opacity-60 animate-pulse-gentle"></div>
+            <div className="relative p-5 rounded-2xl glass-card shadow-xl transition-all hover:scale-105 active:scale-95 duration-300">
               <img 
                 src={logoImage} 
                 alt="Fotos de Natal - Sessões especiais 2025" 
@@ -24,8 +24,8 @@ export function HeaderLogo() {
             </div>
           </div>
           
-          <div className="mt-1">
-            <p className="text-lg sm:text-base font-bold text-foreground drop-shadow-lg shimmer-effect tracking-wide">
+          <div className="mt-2">
+            <p className="text-lg sm:text-base font-bold text-foreground drop-shadow-xl tracking-wide">
               Sessões especiais 2025 🎄
             </p>
           </div>

@@ -14,19 +14,21 @@ export function TopBanner({ packageSlug, onChangePackage }: TopBannerProps) {
 
   return (
     <div className="app-section">
-      <div className="app-card bg-gradient-to-r from-secondary/20 to-accent/20 border-secondary/30">
+      <div className="native-card bg-gradient-to-br from-secondary/10 to-accent/10 border-secondary/20">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-full bg-accent/20 flex-shrink-0">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 flex-shrink-0 shadow-sm">
               <AlertTriangle className="w-5 h-5 text-accent" />
             </div>
             <div className="flex-1">
-              <p className="text-base text-foreground leading-relaxed mb-4">
+              <p className="text-base text-foreground leading-relaxed mb-5">
                 {i18n.premiumHoursBanner}
               </p>
               <Button
+                variant="native"
+                size="lg"
                 onClick={onChangePackage}
-                className="touch-large bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground font-bold shadow-button hover:shadow-glow active:scale-95 transition-all duration-200"
+                className="bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground font-bold shadow-lg hover:shadow-xl"
               >
                 {i18n.changePackage}
               </Button>

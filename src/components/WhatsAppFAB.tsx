@@ -18,11 +18,14 @@ export function WhatsAppFAB() {
   
   return (
     <Button
+      variant="ghost"
+      size="icon"
       onClick={handleWhatsAppClick}
-      className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 shadow-lg hover:shadow-xl transition-all duration-300 z-50 animate-pulse-gentle border-2 border-white/20 active:scale-95"
+      className="fixed bottom-6 right-6 w-14 h-14 rounded-2xl shadow-xl hover:shadow-2xl z-50 border-2 border-white/20 backdrop-blur-sm"
       style={{
         background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-        boxShadow: '0 8px 32px rgba(37, 211, 102, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 8px 32px rgba(37, 211, 102, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        animation: 'pulse-gentle 3s ease-in-out infinite',
       }}
     >
       <WhatsAppIcon />

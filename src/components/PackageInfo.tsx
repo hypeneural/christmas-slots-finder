@@ -11,15 +11,15 @@ interface PackageInfoProps {
 export function PackageInfo({ package: pkg }: PackageInfoProps) {
   return (
     <div className="app-section">
-      <Card className="app-card">
-        <CardContent className="p-6">
+      <div className="native-card">
+        <div className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-foreground mb-2">
+              <h2 className="text-xl font-bold text-foreground mb-3">
                 {pkg.name}
               </h2>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <div className="p-2 rounded-full bg-primary/20">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <div className="p-2.5 rounded-2xl bg-gradient-to-br from-primary/20 to-primary-glow/20 shadow-sm">
                   <Clock className="w-4 h-4 text-primary" />
                 </div>
                 <span className="text-base font-medium">
@@ -34,7 +34,7 @@ export function PackageInfo({ package: pkg }: PackageInfoProps) {
                   <Badge 
                     key={index}
                     variant="secondary"
-                    className="text-xs bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-button"
+                    className="text-xs bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-sm border-accent/20 px-3 py-1 rounded-full"
                   >
                     {badge}
                   </Badge>
@@ -42,8 +42,8 @@ export function PackageInfo({ package: pkg }: PackageInfoProps) {
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -64,10 +64,19 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			spacing: {
+				'safe-top': 'var(--safe-area-top)',
+				'safe-bottom': 'var(--safe-area-bottom)',
+				'safe-left': 'var(--safe-area-left)',
+				'safe-right': 'var(--safe-area-right)',
+			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				'xs': 'var(--radius-xs)',
+				'sm': 'var(--radius-sm)', 
+				'md': 'var(--radius-md)',
+				lg: 'var(--radius-lg)',
+				xl: 'var(--radius-xl)',
+				'2xl': 'var(--radius-2xl)',
 			},
 			keyframes: {
 				'accordion-down': {

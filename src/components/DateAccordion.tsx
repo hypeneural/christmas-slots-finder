@@ -36,32 +36,32 @@ export function DateAccordion({ slots, onSlotClick }: DateAccordionProps) {
             <AccordionItem
               key={dateStr}
               value={dateStr}
-              className="app-card border-border/30"
+              className="native-card border-0 mb-4"
             >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline transition-all duration-200 hover:bg-primary/5">
+              <AccordionTrigger className="px-6 py-5 hover:no-underline transition-all duration-300 hover:bg-primary/3 rounded-t-xl">
                 <div className="flex items-center gap-4 text-left w-full">
-                  <div className="p-3 rounded-full bg-primary/20 flex-shrink-0">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary-glow/20 flex-shrink-0 shadow-sm">
                     <Calendar className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-lg font-bold text-foreground">
+                    <div className="text-lg font-bold text-foreground mb-1">
                       {dateLabel}
                     </div>
                     <div className="text-sm text-muted-foreground capitalize font-medium">
                       {dayLabel}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 bg-secondary/20 px-3 py-1 rounded-full">
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-secondary/20 to-secondary/10 px-4 py-2 rounded-full border border-secondary/10">
                     <Clock className="w-4 h-4 text-secondary" />
                     <span className="text-sm font-semibold text-secondary">
-                      {times.length} horário{times.length > 1 ? 's' : ''}
+                      {times.length}
                     </span>
                   </div>
                 </div>
               </AccordionTrigger>
               
               <AccordionContent className="px-6 pb-6">
-                <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="grid grid-cols-2 gap-4 mt-6">
                   {times.map((time) => (
                     <SlotButton
                       key={time}

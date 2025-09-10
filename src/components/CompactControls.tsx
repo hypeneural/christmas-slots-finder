@@ -25,10 +25,10 @@ export function CompactControls({
 }: CompactControlsProps) {
   return (
     <div 
-      className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/30 safe-area-top"
-      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      className="sticky top-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border/20 safe-area-top shadow-sm"
+      style={{ paddingTop: 'var(--safe-area-top, 0px)' }}
     >
-      <div className="app-section py-3 space-y-3">
+      <div className="app-section py-4 space-y-4">
         {/* Category Selection */}
         <CategoryDropdown
           categorizedPaged={categorizedPaged}

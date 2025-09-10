@@ -52,21 +52,48 @@ All colors MUST be HSL for semantic theming.
     --shadow-card: 0 8px 25px -5px hsl(355 25% 3% / 0.6);
     --shadow-button: 0 4px 15px -2px hsl(var(--primary) / 0.3);
 
-  /* Mobile Touch Targets */
-  --touch-target: 56px;
-  --touch-margin: 16px;
-  
-  /* Native App Spacing */
-  --app-padding: 20px;
-  --section-gap: 24px;
-  --card-radius: 16px;
-  --button-radius: 12px;
+  /* Touch Targets - Native Mobile Standards */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --touch-target-large: 56px;
 
-  /* Safe Area Support */
+  /* Native Spacing System */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 0.75rem;    /* 12px */
+  --spacing-lg: 1rem;       /* 16px */
+  --spacing-xl: 1.5rem;     /* 24px */
+  --spacing-2xl: 2rem;      /* 32px */
+  --spacing-3xl: 2.5rem;    /* 40px */
+
+  /* Native Border Radius */
+  --radius-xs: 0.375rem;    /* 6px - iOS style */
+  --radius-sm: 0.5rem;      /* 8px */
+  --radius-md: 0.75rem;     /* 12px - Android Material */
+  --radius-lg: 1rem;        /* 16px */
+  --radius-xl: 1.5rem;      /* 24px - Cards */
+  --radius-2xl: 2rem;       /* 32px - FABs */
+
+  /* Native Shadows - iOS/Android inspired */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Native Motion - iOS/Android curves */
+  --motion-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --motion-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --motion-duration-short: 150ms;
+  --motion-duration-medium: 250ms;
+  --motion-duration-long: 400ms;
+
+  /* Safe Area Insets */
   --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-left: env(safe-area-inset-left, 0px);
-  --safe-area-right: env(safe-area-inset-right, 0px);
 
     --radius: 12px;
 
@@ -106,8 +133,33 @@ All colors MUST be HSL for semantic theming.
     @apply px-[var(--app-padding)] mb-[var(--section-gap)];
   }
 
+  /* Native Card Styles */
   .app-card {
-    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-[var(--card-radius)] shadow-card;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border) / 0.1);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: all var(--motion-duration-medium) var(--motion-ease-out);
+  }
+
+  .app-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .native-card {
+    background: hsl(var(--card));
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: all var(--motion-duration-medium) var(--motion-ease-out);
+    border: 1px solid hsl(var(--border) / 0.06);
+  }
+
+  .native-card:active {
+    transform: scale(0.98);
+    transition: all var(--motion-duration-short) var(--motion-spring);
   }
 
   /* Christmas button variants */
@@ -143,14 +195,69 @@ All colors MUST be HSL for semantic theming.
     transform: translateY(0);
   }
 
-  /* Mobile touch targets */
+  /* Native touch targets */
   .touch-target {
-    @apply min-h-[var(--touch-target)] min-w-[var(--touch-target)];
-    @apply p-[var(--touch-margin)];
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: all var(--motion-duration-short) var(--motion-ease-out);
   }
 
   .touch-large {
-    @apply min-h-[64px] px-6 py-4 text-lg font-medium;
+    min-width: var(--touch-target-comfortable);
+    min-height: var(--touch-target-comfortable);
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
+
+  .touch-xl {
+    min-width: var(--touch-target-large);
+    min-height: var(--touch-target-large);
+    padding: var(--spacing-xl) var(--spacing-2xl);
+  }
+
+  /* Native-style button with haptic feedback simulation */
+  .native-button {
+    background: linear-gradient(145deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    transition: all var(--motion-duration-short) var(--motion-ease-out);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .native-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .native-button:active {
+    transform: translateY(0px) scale(0.98);
+    transition: all var(--motion-duration-short) var(--motion-spring);
+  }
+
+  /* Ripple effect for native feel */
+  .native-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width var(--motion-duration-medium) var(--motion-ease-out),
+                height var(--motion-duration-medium) var(--motion-ease-out);
+  }
+
+  .native-button:active::before {
+    width: 300px;
+    height: 300px;
   }
 
   /* Christmas animations */
