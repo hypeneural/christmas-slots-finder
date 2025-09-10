@@ -1,14 +1,16 @@
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { Clock, Gift, Sparkles } from 'lucide-react';
+import { Clock, Gift, Sparkles, ArrowLeft } from 'lucide-react';
 import { i18n } from '../lib/i18n';
 import type { Package } from '../types';
 
 interface PackageInfoProps {
   package: Package;
+  onChangePackage?: () => void;
 }
 
-export function PackageInfo({ package: pkg }: PackageInfoProps) {
+export function PackageInfo({ package: pkg, onChangePackage }: PackageInfoProps) {
   return (
     <div className="mb-4">
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-red-50/80 to-green-50/80 border border-red-200/60 shadow-lg backdrop-blur-sm">
@@ -34,26 +36,16 @@ export function PackageInfo({ package: pkg }: PackageInfoProps) {
               </div>
             </div>
             
-            {pkg.badges && pkg.badges.length > 0 && (
-              <div className="flex gap-1">
-                {pkg.badges.slice(0, 2).map((badge, index) => (
-                  <Badge 
-                    key={index}
-                    variant="outline"
-                    className="text-xs bg-gradient-to-r from-red-100/80 to-green-100/80 text-slate-700 border-red-200/60 px-2 py-1 rounded-full font-medium"
-                  >
-                    {badge}
-                  </Badge>
-                ))}
-                {pkg.badges.length > 2 && (
-                  <Badge 
-                    variant="outline"
-                    className="text-xs bg-slate-100/80 text-slate-600 border-slate-200/60 px-2 py-1 rounded-full font-medium"
-                  >
-                    +{pkg.badges.length - 2}
-                  </Badge>
-                )}
-              </div>
+            {onChangePackage && (
+              <Button
+                onClick={onChangePackage}
+                variant="outline"
+                size="sm"
+                className="text-xs bg-gradient-to-r from-red-100/80 to-green-100/80 text-slate-700 border-red-200/60 hover:from-red-200/80 hover:to-green-200/80 hover:border-red-300/60 transition-all duration-200 touch-target-enhanced performance-optimized"
+              >
+                <ArrowLeft className="w-3 h-3 mr-1" />
+                Alterar pacote
+              </Button>
             )}
           </div>
         </div>

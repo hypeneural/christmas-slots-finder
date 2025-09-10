@@ -10,7 +10,7 @@ interface FloatingFiltersProps {
   filters: Filters;
   activeCount: number;
   hasActiveFilters: boolean;
-  onOpenFilters: () => void;
+  onApplyFilters: (filters: Filters) => void;
   onClearFilters: () => void;
   isSticky: boolean;
 }
@@ -19,7 +19,7 @@ export function FloatingFilters({
   filters,
   activeCount,
   hasActiveFilters,
-  onOpenFilters,
+  onApplyFilters,
   onClearFilters,
   isSticky
 }: FloatingFiltersProps) {
@@ -32,10 +32,7 @@ export function FloatingFilters({
     setIsVisible(!isSticky && hasActiveFilters);
   }, [isSticky, hasActiveFilters]);
 
-  const handleOpenFilters = () => {
-    triggerHaptic('light');
-    onOpenFilters();
-  };
+  // Note: onOpenFilters is now handled internally by FiltersBar
 
   const handleClearFilters = () => {
     triggerHaptic('light');
@@ -83,23 +80,7 @@ export function FloatingFilters({
             </Button>
           )}
 
-          {/* Filter Button */}
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleOpenFilters}
-            className="h-14 w-14 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 relative animate-bounce-gentle"
-          >
-            <Filter className="w-6 h-6" />
-            {activeCount > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="absolute -top-2 -right-2 h-6 w-6 p-0 text-xs bg-accent text-accent-foreground rounded-full flex items-center justify-center font-bold"
-              >
-                {activeCount}
-              </Badge>
-            )}
-          </Button>
+          {/* Filter Button - Now handled by FiltersBar */}
 
           {/* Expand Button */}
           {summary.length > 0 && (

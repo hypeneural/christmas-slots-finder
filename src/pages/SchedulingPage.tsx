@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { HeaderLogo } from '../components/HeaderLogo';
@@ -8,8 +8,8 @@ import { PackageInfo } from '../components/PackageInfo';
 import { CompactControls } from '../components/CompactControls';
 import { DateAccordion } from '../components/DateAccordion';
 import { InfiniteScrollContainer } from '../components/InfiniteScrollContainer';
-import { ConfirmDialog } from '../components/ConfirmDialog';
-import { PaymentDialog } from '../components/PaymentDialog';
+import { OptimizedTouchModal } from '../components/OptimizedTouchModal';
+import { OptimizedPaymentModal } from '../components/OptimizedPaymentModal';
 import { WhatsAppFAB } from '../components/WhatsAppFAB';
 import { FiltersSheet } from '../components/FiltersSheet';
 import { PullToRefresh } from '../components/PullToRefresh';
@@ -24,6 +24,10 @@ import type { CategoryKey } from '../types';
 export default function SchedulingPage() {
   const { packageSlug } = useParams<{ packageSlug: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if user came with /pg in URL (already paid)
+  const isAlreadyPaid = location.pathname.includes('/pg');
   
   // Filters state
   const {
@@ -69,6 +73,15 @@ export default function SchedulingPage() {
     const dayLabel = format(parsedDate, 'EEEE', { locale: ptBR });
     
     setSelectedSlot({ date, time, dateLabel, dayLabel });
+    
+    // If user came with /pg in URL, redirect directly to WhatsApp
+    if (isAlreadyPaid) {
+      const whatsappUrl = buildWhatsAppDeepLink(dateLabel, dayLabel, time);
+      window.open(whatsappUrl, '_blank');
+      return;
+    }
+    
+    // Otherwise, show confirmation dialog
     setShowConfirmDialog(true);
   };
 
@@ -155,7 +168,22 @@ export default function SchedulingPage() {
       
       <TopBanner packageSlug={packageSlug} onChangePackage={handleChangePackage} />
       
-      <PackageInfo package={packageMeta} />
+      {/* Already Paid Indicator */}
+      {isAlreadyPaid && (
+        <div className="mx-4 mb-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-sm">✓</span>
+            </div>
+            <div>
+              <h3 className="font-semibold text-green-800 text-base">Pagamento Confirmado</h3>
+              <p className="text-green-700 text-sm">Clique em qualquer horário para agendar diretamente no WhatsApp</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <PackageInfo package={packageMeta} onChangePackage={isAlreadyPaid ? undefined : handleChangePackage} />
       
       <CompactControls
         categorizedPaged={categorizedPaged}
@@ -164,7 +192,7 @@ export default function SchedulingPage() {
         filters={filters}
         activeFiltersCount={activeCount}
         hasActiveFilters={hasActiveFilters}
-        onOpenFilters={openSheet}
+        onApplyFilters={setFilters}
         onClearFilters={clearFilters}
       />
       
@@ -203,7 +231,7 @@ export default function SchedulingPage() {
       
       {selectedSlot && (
         <>
-          <ConfirmDialog
+          <OptimizedTouchModal
             open={showConfirmDialog}
             onOpenChange={setShowConfirmDialog}
             dateLabel={selectedSlot.dateLabel}
@@ -213,9 +241,12 @@ export default function SchedulingPage() {
             onWantToPay={handleWantToPay}
           />
           
-          <PaymentDialog
+          <OptimizedPaymentModal
             open={showPaymentDialog}
             onOpenChange={setShowPaymentDialog}
+            dateLabel={selectedSlot.dateLabel}
+            dayLabel={selectedSlot.dayLabel}
+            time={selectedSlot.time}
           />
         </>
       )}

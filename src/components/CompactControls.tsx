@@ -11,7 +11,7 @@ interface CompactControlsProps {
   filters: Filters;
   activeFiltersCount: number;
   hasActiveFilters: boolean;
-  onOpenFilters: () => void;
+  onApplyFilters: (filters: Filters) => void;
   onClearFilters: () => void;
 }
 
@@ -22,7 +22,7 @@ export function CompactControls({
   filters,
   activeFiltersCount,
   hasActiveFilters,
-  onOpenFilters,
+  onApplyFilters,
   onClearFilters
 }: CompactControlsProps) {
   const { isSticky, elementRef } = useStickyState();
@@ -31,7 +31,9 @@ export function CompactControls({
     <>
       <div 
         ref={elementRef}
-        className="sticky top-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border/20 safe-area-top shadow-sm"
+        className={`sticky top-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border/20 safe-area-top shadow-sm transition-all duration-200 ${
+          !isSticky ? 'mb-4' : ''
+        }`}
         style={{ 
           paddingTop: 'var(--safe-area-top, 0px)',
           position: 'sticky',
@@ -39,7 +41,7 @@ export function CompactControls({
           zIndex: 50
         }}
       >
-        <div className="px-4 py-1.5">
+        <div className="px-4 py-3">
           <div className="flex items-center gap-3 w-full">
             {/* Category Selection - Takes most space */}
             <div className="flex-1 min-w-0">
@@ -56,7 +58,7 @@ export function CompactControls({
                 filters={filters}
                 activeCount={activeFiltersCount}
                 hasActiveFilters={hasActiveFilters}
-                onOpenFilters={onOpenFilters}
+                onApplyFilters={onApplyFilters}
                 onClearFilters={onClearFilters}
               />
             </div>
@@ -69,7 +71,7 @@ export function CompactControls({
         filters={filters}
         activeCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
-        onOpenFilters={onOpenFilters}
+        onApplyFilters={onApplyFilters}
         onClearFilters={onClearFilters}
         isSticky={isSticky}
       />

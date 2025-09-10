@@ -25,12 +25,16 @@ export function DayOfWeekPicker({
   onlyWeekends,
   onToggleWeekends
 }: DayOfWeekPickerProps) {
+  // Ensure value is always an array
+  const safeValue = value || [];
+  const safeOnlyWeekends = onlyWeekends || false;
+
   const handleDayToggle = (days: string[]) => {
     onChange(days as DayCode[]);
   };
 
   const handleWeekendsToggle = () => {
-    if (onlyWeekends) {
+    if (safeOnlyWeekends) {
       onToggleWeekends(false);
       onChange([]);
     } else {
@@ -44,7 +48,7 @@ export function DayOfWeekPicker({
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium text-foreground">Dia da semana</h4>
         <Button
-          variant={onlyWeekends ? 'default' : 'outline'}
+          variant={safeOnlyWeekends ? 'default' : 'outline'}
           size="sm"
           onClick={handleWeekendsToggle}
           className="text-sm"
@@ -55,9 +59,9 @@ export function DayOfWeekPicker({
 
       <ToggleGroup
         type="multiple"
-        value={onlyWeekends ? ['Sat', 'Sun'] : value}
+        value={safeOnlyWeekends ? ['Sat', 'Sun'] : safeValue}
         onValueChange={handleDayToggle}
-        disabled={onlyWeekends}
+        disabled={safeOnlyWeekends}
         className="grid grid-cols-7 gap-1"
       >
         {DAYS.map((day) => (
@@ -72,9 +76,9 @@ export function DayOfWeekPicker({
         ))}
       </ToggleGroup>
 
-      {value.length > 0 && !onlyWeekends && (
+      {safeValue.length > 0 && !safeOnlyWeekends && (
         <p className="text-xs text-muted-foreground">
-          {value.length} dias selecionados
+          {safeValue.length} dias selecionados
         </p>
       )}
     </div>

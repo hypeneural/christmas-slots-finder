@@ -27,6 +27,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<PackageSelection />} />
               <Route path="/:packageSlug" element={<SchedulingPage />} />
+              <Route path="/:packageSlug/pg" element={<SchedulingPage />} />
               <Route path="/:packageSlug/pg/:page" element={<SchedulingPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

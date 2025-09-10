@@ -4,7 +4,7 @@
       "id": 1, 
       "slug": "ho-ho-ho", 
       "name": "Experiência Ho-Ho-Ho", 
-      "durationMinutes": 20 
+      "durationMinutes": 15 
     },
     { 
       "id": 2, 
@@ -17,7 +17,8 @@
       "id": 3, 
       "slug": "boas-festas", 
       "name": "Experiência Boas Festas", 
-      "durationMinutes": 60 
+      "durationMinutes": 60,
+      "badges": ["Mais completo"]
     }
   ],
   "availability": {

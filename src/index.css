@@ -320,6 +320,113 @@ All colors MUST be HSL for semantic theming.
     transform: translateZ(0);
     backface-visibility: hidden;
     perspective: 1000px;
+    will-change: transform, opacity;
+  }
+
+  /* Optimize touch interactions */
+  .touch-optimized {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  /* Reduce layout thrashing */
+  .layout-stable {
+    contain: layout style paint;
+  }
+
+  /* Optimize animations */
+  .animate-optimized {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
+  /* Prevent layout thrashing */
+  .prevent-reflow {
+    contain: layout style paint;
+    will-change: auto;
+  }
+
+  /* Optimize vaul drawer */
+  .vaul-drawer-optimized {
+    contain: layout style paint;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Optimize touch interactions */
+  .touch-optimized-enhanced {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    contain: layout style paint;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Advanced performance optimizations */
+  .performance-optimized {
+    contain: layout style paint;
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .message-handler-optimized {
+    contain: layout style paint;
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Optimize modal performance */
+  .modal-optimized {
+    contain: layout style paint;
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Enhanced touch targets */
+  .touch-target-enhanced {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: manipulation;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    contain: layout style paint;
   }
 
   .smooth-scroll {
@@ -645,4 +752,66 @@ All colors MUST be HSL for semantic theming.
   100% {
     transform: scale(1);
   }
+}
+
+/* Touch-friendly modal animations */
+@keyframes modal-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes modal-slide-down {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes success-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Touch feedback classes */
+.animate-modal-slide-up {
+  animation: modal-slide-up 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-modal-slide-down {
+  animation: modal-slide-down 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-success-pulse {
+  animation: success-pulse 0.6s ease-in-out;
+}
+
+.animate-ripple-expand {
+  animation: ripple-expand 0.6s ease-out;
 }

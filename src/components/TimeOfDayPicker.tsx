@@ -45,11 +45,17 @@ export function TimeOfDayPicker({
   onlyAfter18,
   onToggleAfter18
 }: TimeOfDayPickerProps) {
+  // Ensure all values are safe
+  const safeTimeOfDay = timeOfDay || [];
+  const safeTimeRange = timeRange || ['08:00', '18:00'];
+  const safeExactTime = exactTime || '';
+  const safeOnlyAfter18 = onlyAfter18 || false;
+
   const [useCustomRange, setUseCustomRange] = useState(!!timeRange);
   const [useExactTime, setUseExactTime] = useState(!!exactTime);
 
-  const sliderValue = timeRange 
-    ? [timeToMinutes(timeRange[0]), timeToMinutes(timeRange[1])]
+  const sliderValue = safeTimeRange 
+    ? [timeToMinutes(safeTimeRange[0]), timeToMinutes(safeTimeRange[1])]
     : [360, 1320]; // 06:00 to 22:00
 
   const handleTimeOfDayChange = (times: string[]) => {
@@ -212,16 +218,16 @@ export function TimeOfDayPicker({
       </div>
 
       {/* Active Filter Summary */}
-      {(onlyAfter18 || timeOfDay.length > 0 || useCustomRange || useExactTime) && (
+      {(safeOnlyAfter18 || safeTimeOfDay.length > 0 || useCustomRange || useExactTime) && (
         <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
           <p className="text-xs text-muted-foreground mb-1">Filtro ativo:</p>
           <p className="text-sm font-medium">
-            {onlyAfter18 && '🌙 Após 18h'}
-            {timeOfDay.length > 0 && timeOfDay.map(t => 
+            {safeOnlyAfter18 && '🌙 Após 18h'}
+            {safeTimeOfDay.length > 0 && safeTimeOfDay.map(t => 
               TIME_OPTIONS.find(opt => opt.value === t)?.label
             ).join(', ')}
-            {useCustomRange && timeRange && `${timeRange[0]} - ${timeRange[1]}`}
-            {useExactTime && exactTime && `Exato: ${exactTime}`}
+            {useCustomRange && safeTimeRange && `${safeTimeRange[0]} - ${safeTimeRange[1]}`}
+            {useExactTime && safeExactTime && `Exato: ${safeExactTime}`}
           </p>
         </div>
       )}
