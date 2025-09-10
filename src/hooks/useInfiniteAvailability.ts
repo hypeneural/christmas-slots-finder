@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchAvailability } from '../services/api';
+import { fetchAvailability, fetchAvailabilityWithFilters } from '../services/api';
 import { buildAvailableSlots, categorizeSlots, paginateDates } from '../lib/scheduling';
+import { isRealApiEnabled } from '../lib/apiConfig';
 import type { CategorizedPaged, Package, AvailabilityData, Filters, CategoryKey, Categorized } from '../types';
 
 interface UseInfiniteAvailabilityResult {
@@ -11,6 +12,9 @@ interface UseInfiniteAvailabilityResult {
   packageMeta: Package | null;
   loadMore: (category: CategoryKey) => Promise<void>;
   refetch: () => void;
+  hasNextPage: boolean;
+  currentPage: number;
+  totalPages: number;
 }
 
 export function useInfiniteAvailability(
@@ -24,15 +28,12 @@ export function useInfiniteAvailability(
   const [error, setError] = useState<string | null>(null);
   const [packageMeta, setPackageMeta] = useState<Package | null>(null);
   
-  // Keep track of current pages for each category
-  const [currentPages, setCurrentPages] = useState<Record<CategoryKey, number>>({
-    all: 1,
-    afterHours: 1,
-    saturdays: 1,
-    sundaysHolidays: 1
-  });
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
   
-  // Store all categorized data (not paginated) for infinite loading
+  // Store all accumulated categorized data for infinite loading
   const [allCategorizedData, setAllCategorizedData] = useState<Categorized | null>(null);
 
   const loadInitialData = async () => {
@@ -42,38 +43,78 @@ export function useInfiniteAvailability(
     setError(null);
 
     try {
-      const data: AvailabilityData = await fetchAvailability(packageSlug);
+      let data: AvailabilityData;
+      let categorized: Categorized;
+      let pagination: any = null;
+
+      if (isRealApiEnabled()) {
+        // Use real API with filters
+        const result = await fetchAvailabilityWithFilters(packageSlug, filters, 1, perPage);
+        data = result.data;
+        categorized = result.categorized;
+        pagination = result.pagination;
+        
+        // Update pagination state
+        console.log('📄 Initial pagination info:', {
+          currentPage: pagination.currentPage,
+          totalPages: pagination.totalPages,
+          hasNextPage: pagination.hasNextPage
+        });
+        setCurrentPage(pagination.currentPage);
+        setTotalPages(pagination.totalPages);
+        setHasNextPage(pagination.hasNextPage);
+      } else {
+        // Use mock data (existing logic)
+        data = await fetchAvailability(packageSlug);
+        
+        // Process availability data with filters
+        const availableSlots = buildAvailableSlots(
+          { packages: data.packages, availability: data.availability },
+          'America/Sao_Paulo',
+          filters
+        );
+
+        categorized = categorizeSlots(
+          availableSlots,
+          data.availability.holidays
+        );
+        
+        // Mock pagination for local data
+        setCurrentPage(1);
+        setTotalPages(1);
+        setHasNextPage(false);
+      }
       
       // Find package metadata
       const pkg = data.packages.find(p => p.slug === packageSlug);
       setPackageMeta(pkg || null);
 
-      // Process availability data with filters
-      const availableSlots = buildAvailableSlots(
-        { packages: data.packages, availability: data.availability },
-        'America/Sao_Paulo',
-        filters
-      );
-
-      const categorized = categorizeSlots(
-        availableSlots,
-        data.availability.holidays
-      );
-
       // Store all data for infinite loading
       setAllCategorizedData(categorized);
 
-      // Reset pages when filters change
-      const resetPages = {
-        all: 1,
-        afterHours: 1,
-        saturdays: 1,
-        sundaysHolidays: 1
+      // Get initial paginated data - show ALL data for infinite scroll
+      const paginated = {
+        all: {
+          slots: categorized.all,
+          totalPages: 1,
+          currentPage: 1
+        },
+        afterHours: {
+          slots: categorized.afterHours,
+          totalPages: 1,
+          currentPage: 1
+        },
+        saturdays: {
+          slots: categorized.saturdays,
+          totalPages: 1,
+          currentPage: 1
+        },
+        sundaysHolidays: {
+          slots: categorized.sundaysHolidays,
+          totalPages: 1,
+          currentPage: 1
+        }
       };
-      setCurrentPages(resetPages);
-
-      // Get initial paginated data (page 1 for all categories)
-      const paginated = paginateDates(categorized, perPage, 1);
       setCategorizedPaged(paginated);
 
     } catch (err) {
@@ -87,59 +128,113 @@ export function useInfiniteAvailability(
   };
 
   const loadMore = useCallback(async (category: CategoryKey) => {
-    if (!allCategorizedData || loadingMore) return;
+    if (!hasNextPage || loadingMore || !packageSlug) return;
 
-    const nextPage = currentPages[category] + 1;
-    
+    const nextPage = currentPage + 1;
     setLoadingMore(true);
 
     try {
-      // Simulate network delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 300));
+      if (isRealApiEnabled()) {
+        // Use real API for pagination
+        const result = await fetchAvailabilityWithFilters(packageSlug, filters, nextPage, perPage);
+        const newCategorized = result.categorized;
+        const pagination = result.pagination;
 
-      // Get data for the next page
-      const singleCategoryData: Categorized = {
-        all: category === 'all' ? allCategorizedData.all : {},
-        afterHours: category === 'afterHours' ? allCategorizedData.afterHours : {},
-        saturdays: category === 'saturdays' ? allCategorizedData.saturdays : {},
-        sundaysHolidays: category === 'sundaysHolidays' ? allCategorizedData.sundaysHolidays : {}
-      };
-      
-      const nextPageData = paginateDates(singleCategoryData, perPage, nextPage);
+        // Update pagination state
+        console.log('📄 Load more pagination info:', {
+          currentPage: pagination.currentPage,
+          totalPages: pagination.totalPages,
+          hasNextPage: pagination.hasNextPage
+        });
+        setCurrentPage(pagination.currentPage);
+        setTotalPages(pagination.totalPages);
+        setHasNextPage(pagination.hasNextPage);
 
-      // Check if there's more data to load
-      if (Object.keys(nextPageData[category].slots).length === 0) {
+        // Merge new data with existing accumulated data and update view
+        setAllCategorizedData(prevData => {
+          if (!prevData) {
+            console.log('🔄 First page data:', Object.keys(newCategorized.all).length, 'dates');
+            const paginated = {
+              all: {
+                slots: newCategorized.all,
+                totalPages: 1,
+                currentPage: 1
+              },
+              afterHours: {
+                slots: newCategorized.afterHours,
+                totalPages: 1,
+                currentPage: 1
+              },
+              saturdays: {
+                slots: newCategorized.saturdays,
+                totalPages: 1,
+                currentPage: 1
+              },
+              sundaysHolidays: {
+                slots: newCategorized.sundaysHolidays,
+                totalPages: 1,
+                currentPage: 1
+              }
+            };
+            setCategorizedPaged(paginated);
+            return newCategorized;
+          }
+
+          console.log('🔄 Merging data - Previous:', Object.keys(prevData.all).length, 'dates, New:', Object.keys(newCategorized.all).length, 'dates');
+
+          const mergedData = {
+            all: { ...prevData.all, ...newCategorized.all },
+            afterHours: { ...prevData.afterHours, ...newCategorized.afterHours },
+            saturdays: { ...prevData.saturdays, ...newCategorized.saturdays },
+            sundaysHolidays: { ...prevData.sundaysHolidays, ...newCategorized.sundaysHolidays }
+          };
+
+          console.log('🔄 Merged data:', Object.keys(mergedData.all).length, 'total dates');
+
+          // Update paginated view with merged data - show ALL data for infinite scroll
+          const paginated = {
+            all: {
+              slots: mergedData.all,
+              totalPages: 1,
+              currentPage: 1
+            },
+            afterHours: {
+              slots: mergedData.afterHours,
+              totalPages: 1,
+              currentPage: 1
+            },
+            saturdays: {
+              slots: mergedData.saturdays,
+              totalPages: 1,
+              currentPage: 1
+            },
+            sundaysHolidays: {
+              slots: mergedData.sundaysHolidays,
+              totalPages: 1,
+              currentPage: 1
+            }
+          };
+          setCategorizedPaged(paginated);
+
+          return mergedData;
+        });
+
+      } else {
+        // Use mock data (existing logic)
+        // Simulate network delay for better UX
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // For mock data, we don't have real pagination, so just return
         setLoadingMore(false);
         return;
       }
 
-      // Merge new data with existing data
-      setCategorizedPaged(prevData => {
-        if (!prevData) return prevData;
-
-        return {
-          ...prevData,
-          [category]: {
-            ...prevData[category],
-            slots: {
-              ...prevData[category].slots,
-              ...nextPageData[category].slots
-            },
-            currentPage: nextPage
-          }
-        };
-      });
-
-      // Update current page for this category
-      setCurrentPages(prev => ({
-        ...prev,
-        [category]: nextPage
-      }));
-
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar mais horários');
     } finally {
       setLoadingMore(false);
     }
-  }, [allCategorizedData, currentPages, perPage, loadingMore]);
+  }, [hasNextPage, currentPage, loadingMore, packageSlug, filters, perPage, allCategorizedData]);
 
   useEffect(() => {
     loadInitialData();
@@ -152,6 +247,9 @@ export function useInfiniteAvailability(
     error,
     packageMeta,
     loadMore,
-    refetch: loadInitialData
+    refetch: loadInitialData,
+    hasNextPage,
+    currentPage,
+    totalPages
   };
 }

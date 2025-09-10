@@ -50,7 +50,10 @@ export default function SchedulingPage() {
     loadingMore,
     error, 
     packageMeta, 
-    loadMore 
+    loadMore,
+    hasNextPage,
+    currentPage,
+    totalPages
   } = useInfiniteAvailability(
     packageSlug,
     30, // perPage - increased for mobile
@@ -183,7 +186,10 @@ export default function SchedulingPage() {
         </div>
       )}
       
-      <PackageInfo package={packageMeta} onChangePackage={isAlreadyPaid ? undefined : handleChangePackage} />
+      <PackageInfo 
+        package={packageMeta} 
+        onChangePackage={isAlreadyPaid ? undefined : handleChangePackage} 
+      />
       
       <CompactControls
         categorizedPaged={categorizedPaged}
@@ -200,11 +206,10 @@ export default function SchedulingPage() {
         <PullToRefresh onRefresh={handleRefresh}>
           {(() => {
             const categoryData = categorizedPaged[selectedCategory];
-            const hasMore = categoryData.currentPage < categoryData.totalPages;
             
             return (
               <InfiniteScrollContainer
-                hasMore={hasMore}
+                hasMore={hasNextPage}
                 loading={loadingMore}
                 onLoadMore={() => handleLoadMore(selectedCategory)}
                 threshold={300}

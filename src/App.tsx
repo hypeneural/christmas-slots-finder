@@ -7,6 +7,9 @@ import { SnowEffect } from "./components/SnowEffect";
 import PackageSelection from "./pages/PackageSelection";
 import SchedulingPage from "./pages/SchedulingPage";
 import NotFound from "./pages/NotFound";
+import { ApiIntegrationTest } from "./components/ApiIntegrationTest";
+import { SimpleApiTest } from "./components/SimpleApiTest";
+import { ApiValidationTest } from "./components/ApiValidationTest";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +29,9 @@ const App = () => (
           >
             <Routes>
               <Route path="/" element={<PackageSelection />} />
+              <Route path="/test-api" element={<ApiIntegrationTest />} />
+              <Route path="/simple-test" element={<SimpleApiTest />} />
+              <Route path="/validation-test" element={<ApiValidationTest />} />
               <Route path="/:packageSlug" element={<SchedulingPage />} />
               <Route path="/:packageSlug/pg" element={<SchedulingPage />} />
               <Route path="/:packageSlug/pg/:page" element={<SchedulingPage />} />

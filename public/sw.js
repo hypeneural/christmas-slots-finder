@@ -7,6 +7,9 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
+// Check if we're in development mode
+const isDevelopment = location.hostname === 'localhost' && (location.port === '8080' || location.port === '5173');
+
 // Install event
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -19,11 +22,38 @@ self.addEventListener('install', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
+  // Skip all requests in development mode
+  if (isDevelopment) {
+    return;
+  }
+  
+  const url = new URL(event.request.url);
+  
+  // Only handle same-origin requests
+  if (url.origin !== location.origin) {
+    return;
+  }
+  
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  // Skip API requests
+  if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         // Return cached version or fetch from network
-        return response || fetch(event.request);
+        return response || fetch(event.request).catch(() => {
+          // If fetch fails, return a basic response for navigation requests
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+        });
       })
   );
 });
