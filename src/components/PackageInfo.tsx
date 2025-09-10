@@ -1,6 +1,6 @@
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
-import { Clock } from 'lucide-react';
+import { Clock, Gift, Sparkles } from 'lucide-react';
 import { i18n } from '../lib/i18n';
 import type { Package } from '../types';
 
@@ -10,35 +10,49 @@ interface PackageInfoProps {
 
 export function PackageInfo({ package: pkg }: PackageInfoProps) {
   return (
-    <div className="app-section">
-      <div className="native-card">
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-foreground mb-3">
-                {pkg.name}
-              </h2>
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <div className="p-2.5 rounded-2xl bg-gradient-to-br from-primary/20 to-primary-glow/20 shadow-sm">
-                  <Clock className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-base font-medium">
+    <div className="mb-4">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-red-50/80 to-green-50/80 border border-red-200/60 shadow-lg backdrop-blur-sm">
+        {/* Decoração natalina sutil */}
+        <div className="absolute top-2 right-2 opacity-30">
+          <Sparkles className="w-3 h-3 text-red-400 animate-twinkle" />
+        </div>
+        
+        <div className="relative p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 shadow-sm">
+                <Gift className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-800 mb-0.5">
+                  {pkg.name}
+                </h3>
+                <p className="text-xs text-slate-600 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
                   {i18n.duration(pkg.durationMinutes)}
-                </span>
+                </p>
               </div>
             </div>
             
             {pkg.badges && pkg.badges.length > 0 && (
-              <div className="flex flex-col gap-2">
-                {pkg.badges.map((badge, index) => (
+              <div className="flex gap-1">
+                {pkg.badges.slice(0, 2).map((badge, index) => (
                   <Badge 
                     key={index}
-                    variant="secondary"
-                    className="text-xs bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-sm border-accent/20 px-3 py-1 rounded-full"
+                    variant="outline"
+                    className="text-xs bg-gradient-to-r from-red-100/80 to-green-100/80 text-slate-700 border-red-200/60 px-2 py-1 rounded-full font-medium"
                   >
                     {badge}
                   </Badge>
                 ))}
+                {pkg.badges.length > 2 && (
+                  <Badge 
+                    variant="outline"
+                    className="text-xs bg-slate-100/80 text-slate-600 border-slate-200/60 px-2 py-1 rounded-full font-medium"
+                  >
+                    +{pkg.badges.length - 2}
+                  </Badge>
+                )}
               </div>
             )}
           </div>

@@ -12,6 +12,8 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PaymentDialog } from '../components/PaymentDialog';
 import { WhatsAppFAB } from '../components/WhatsAppFAB';
 import { FiltersSheet } from '../components/FiltersSheet';
+import { PullToRefresh } from '../components/PullToRefresh';
+import { SlotListSkeleton, HeaderSkeleton } from '../components/SkeletonLoader';
 import { useInfiniteAvailability } from '../hooks/useInfiniteAvailability';
 import { useFilters } from '../hooks/useFilters';
 import { buildWhatsAppDeepLink } from '../lib/scheduling';
@@ -91,6 +93,11 @@ export default function SchedulingPage() {
     await loadMore(category);
   };
 
+  const handleRefresh = async () => {
+    // Trigger a refresh of the data
+    window.location.reload();
+  };
+
   const handleChangePackage = () => {
     navigate('/');
   };
@@ -103,15 +110,11 @@ export default function SchedulingPage() {
   if (loading) {
     return (
       <div className="app-container">
-        <HeaderLogo />
-        <div className="flex items-center justify-center py-16">
-          <div className="text-center">
-            <div className="p-4 rounded-full bg-primary/10 w-fit mx-auto mb-4">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-            <p className="text-lg text-muted-foreground">{i18n.loading}</p>
-          </div>
+        <HeaderSkeleton />
+        <div className="app-section">
+          <SlotListSkeleton />
         </div>
+        <WhatsAppFAB />
       </div>
     );
   }
@@ -166,24 +169,26 @@ export default function SchedulingPage() {
       />
       
       <div className="app-section">
-        {(() => {
-          const categoryData = categorizedPaged[selectedCategory];
-          const hasMore = categoryData.currentPage < categoryData.totalPages;
-          
-          return (
-            <InfiniteScrollContainer
-              hasMore={hasMore}
-              loading={loadingMore}
-              onLoadMore={() => handleLoadMore(selectedCategory)}
-              threshold={300}
-            >
-              <DateAccordion
-                slots={categoryData.slots}
-                onSlotClick={handleSlotClick}
-              />
-            </InfiniteScrollContainer>
-          );
-        })()}
+        <PullToRefresh onRefresh={handleRefresh}>
+          {(() => {
+            const categoryData = categorizedPaged[selectedCategory];
+            const hasMore = categoryData.currentPage < categoryData.totalPages;
+            
+            return (
+              <InfiniteScrollContainer
+                hasMore={hasMore}
+                loading={loadingMore}
+                onLoadMore={() => handleLoadMore(selectedCategory)}
+                threshold={300}
+              >
+                <DateAccordion
+                  slots={categoryData.slots}
+                  onSlotClick={handleSlotClick}
+                />
+              </InfiniteScrollContainer>
+            );
+          })()}
+        </PullToRefresh>
       </div>
       
       <FiltersSheet

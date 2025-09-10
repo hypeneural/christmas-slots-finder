@@ -42,14 +42,14 @@ export function CategoryDropdown({
 
   return (
     <Select value={selectedCategory} onValueChange={onCategoryChange}>
-      <SelectTrigger className="w-full touch-target bg-card/50 backdrop-blur-sm border-border/50 h-12">
-        <div className="flex items-center gap-3 flex-1">
+      <SelectTrigger className="w-full touch-target bg-card/50 backdrop-blur-sm border-border/50 h-9">
+        <div className="flex items-center gap-2 flex-1">
           {selectedCategoryData && (
             <>
-              <selectedCategoryData.icon className="w-5 h-5 text-primary" />
-              <div className="flex items-center gap-2 flex-1">
-                <span className="font-medium">{selectedCategoryData.label}</span>
-                <Badge variant="secondary" className="bg-primary/10 text-primary text-xs px-2 py-0.5">
+              <selectedCategoryData.icon className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="font-medium truncate">{selectedCategoryData.label}</span>
+                <Badge variant="secondary" className="bg-primary/10 text-primary text-xs px-2 py-0.5 flex-shrink-0">
                   {slotsCount}
                 </Badge>
               </div>

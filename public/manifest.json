@@ -1,0 +1,41 @@
+{
+  "name": "Fotos de Natal 2025",
+  "short_name": "Fotos Natal",
+  "description": "Agende sua sessão de fotos de Natal 2025. Escolha entre nossos pacotes especiais e reserve seu horário preferido.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a0f0f",
+  "theme_color": "#1a0f0f",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pt-BR",
+  "categories": ["photography", "lifestyle", "entertainment"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Agendar Sessão",
+      "short_name": "Agendar",
+      "description": "Agendar nova sessão de fotos",
+      "url": "/"
+    }
+  ],
+  "prefer_related_applications": false
+}

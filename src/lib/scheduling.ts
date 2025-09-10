@@ -103,6 +103,38 @@ export function buildAvailableSlots(
 }
 
 /**
+ * Categorize time slots by period of day
+ */
+export function categorizeTimeSlotsByPeriod(times: string[]): {
+  morning: string[];
+  afternoon: string[];
+  evening: string[];
+} {
+  const morning: string[] = [];
+  const afternoon: string[] = [];
+  const evening: string[] = [];
+
+  times.forEach(time => {
+    const [hours] = time.split(':').map(Number);
+    
+    if (hours >= 6 && hours < 12) {
+      morning.push(time);
+    } else if (hours >= 13 && hours < 18) {
+      afternoon.push(time);
+    } else if (hours >= 18 && hours <= 23) {
+      evening.push(time);
+    }
+  });
+
+  // Sort times within each period
+  morning.sort();
+  afternoon.sort();
+  evening.sort();
+
+  return { morning, afternoon, evening };
+}
+
+/**
  * Categorize slots by time type
  */
 export function categorizeSlots(
