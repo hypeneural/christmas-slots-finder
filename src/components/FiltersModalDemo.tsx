@@ -9,11 +9,11 @@ export function FiltersModalDemo() {
   const [filters, setFilters] = useState<Filters>({
     dateFrom: '',
     dateTo: '',
-    timeOfDay: 'any',
-    timeRange: { start: '08:00', end: '18:00' },
+    timeOfDay: [],
+    timeRange: ['08:00', '18:00'],
     exactTime: '',
     onlyAfter18: false,
-    dayOfWeek: []
+    daysOfWeek: []
   });
 
   const handleApplyFilters = (newFilters: Filters) => {
@@ -25,11 +25,11 @@ export function FiltersModalDemo() {
     setFilters({
       dateFrom: '',
       dateTo: '',
-      timeOfDay: 'any',
-      timeRange: { start: '08:00', end: '18:00' },
+      timeOfDay: [],
+      timeRange: ['08:00', '18:00'],
       exactTime: '',
       onlyAfter18: false,
-      dayOfWeek: []
+      daysOfWeek: []
     });
   };
 

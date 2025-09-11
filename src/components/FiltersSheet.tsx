@@ -158,14 +158,8 @@ export function FiltersSheet({
 
           {/* Day of Week */}
           <DayOfWeekPicker
-            value={localFilters.daysOfWeek || []}
+            selectedDays={localFilters.daysOfWeek || []}
             onChange={(days) => setLocalFilters({ ...localFilters, daysOfWeek: days.length > 0 ? days : undefined })}
-            onlyWeekends={localFilters.onlyWeekends || false}
-            onToggleWeekends={(enabled) => setLocalFilters({ 
-              ...localFilters, 
-              onlyWeekends: enabled || undefined,
-              daysOfWeek: enabled ? ['Sat', 'Sun'] : undefined
-            })}
           />
 
           <Separator />

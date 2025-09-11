@@ -3,26 +3,20 @@ import { Drawer } from 'vaul';
 import { 
   Filter, 
   X, 
-  Calendar, 
   CalendarDays, 
   Clock, 
-  Target, 
   Check,
-  Sparkles,
   Settings
 } from 'lucide-react';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
 import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { DragIndicator } from './DragIndicator';
 import { DayOfWeekPicker } from './DayOfWeekPicker';
 import { TimeOfDayPicker } from './TimeOfDayPicker';
+import { DateFilterSection } from './DateFilterSection';
 import { useTouchFeedback } from '@/hooks/useTouchFeedback';
 import { triggerHaptic, countActiveFilters } from '@/lib/filters';
-import { format, addDays, startOfDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { Filters } from '@/types';
 import { memo, useCallback, useEffect, useState } from 'react';
 
@@ -62,7 +56,7 @@ const TouchFriendlyFiltersModalComponent = ({
   onClearFilters
 }: TouchFriendlyFiltersModalProps) => {
   const [localFilters, setLocalFilters] = useState<Filters>({
-    dayOfWeek: [],
+    daysOfWeek: [],
     timeOfDay: [],
     timeRange: ['08:00', '18:00'],
     onlyAfter18: false,
@@ -75,7 +69,7 @@ const TouchFriendlyFiltersModalComponent = ({
   useEffect(() => {
     if (open) {
       setLocalFilters({
-        dayOfWeek: [],
+        daysOfWeek: [],
         timeOfDay: [],
         timeRange: ['08:00', '18:00'],
         onlyAfter18: false,
@@ -85,14 +79,6 @@ const TouchFriendlyFiltersModalComponent = ({
     }
   }, [open, filters]);
 
-  const today = startOfDay(new Date());
-  const tomorrow = addDays(today, 1);
-
-  const dateShortcuts = [
-    { label: 'Hoje', date: format(today, 'yyyy-MM-dd') },
-    { label: 'Amanhã', date: format(tomorrow, 'yyyy-MM-dd') },
-    { label: 'Próximos 7 dias', date: format(addDays(today, 7), 'yyyy-MM-dd') },
-  ];
 
   // Memoize handlers to prevent unnecessary re-renders
   const handleClose = useCallback(() => {
@@ -111,7 +97,7 @@ const TouchFriendlyFiltersModalComponent = ({
     handleClickWithFeedback(() => {
       triggerHaptic('light');
       setLocalFilters({
-        dayOfWeek: [],
+        daysOfWeek: [],
         timeOfDay: [],
         timeRange: ['08:00', '18:00'],
         onlyAfter18: false,
@@ -121,16 +107,6 @@ const TouchFriendlyFiltersModalComponent = ({
     });
   }, [onClearFilters, handleClickWithFeedback]);
 
-  const handleDateShortcut = useCallback((date: string) => {
-    handleClickWithFeedback(() => {
-      triggerHaptic('light');
-      setLocalFilters(prev => ({
-        ...prev,
-        dateFrom: date,
-        dateTo: ''
-      }));
-    });
-  }, [handleClickWithFeedback]);
 
   const activeCount = countActiveFilters(localFilters);
 
@@ -191,69 +167,27 @@ const TouchFriendlyFiltersModalComponent = ({
               </div>
             )}
 
-            {/* Date Range Section */}
-            <div className="space-y-4 mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Calendar className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">Período</h3>
-              </div>
-              
-              {/* Date Shortcuts */}
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {dateShortcuts.map((shortcut) => (
-                  <Button
-                    key={shortcut.label}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDateShortcut(shortcut.date)}
-                    className="h-10 text-xs touch-optimized-enhanced"
-                  >
-                    {shortcut.label}
-                  </Button>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="dateFrom" className="text-sm font-medium">
-                    Data inicial
-                  </Label>
-                  <Input
-                    id="dateFrom"
-                    type="date"
-                    value={localFilters.dateFrom}
-                    onChange={(e) => setLocalFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
-                    className="touch-optimized-enhanced"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="dateTo" className="text-sm font-medium">
-                    Data final
-                  </Label>
-                  <Input
-                    id="dateTo"
-                    type="date"
-                    value={localFilters.dateTo}
-                    onChange={(e) => setLocalFilters(prev => ({ ...prev, dateTo: e.target.value }))}
-                    className="touch-optimized-enhanced"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <Separator className="my-6" />
-
-            {/* Day of Week Section */}
+            {/* Day of Week Section - MOVED TO TOP */}
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-2 mb-3">
                 <CalendarDays className="w-5 h-5 text-primary" />
                 <h3 className="text-lg font-semibold text-foreground">Dias da Semana</h3>
               </div>
               <DayOfWeekPicker
-                selectedDays={localFilters.dayOfWeek || []}
-                onChange={(days) => setLocalFilters(prev => ({ ...prev, dayOfWeek: days }))}
+                selectedDays={localFilters.daysOfWeek || []}
+                onChange={(days) => setLocalFilters(prev => ({ ...prev, daysOfWeek: days }))}
               />
             </div>
+
+            <Separator className="my-6" />
+
+            {/* Date Range Section - MOVED TO SECOND POSITION */}
+            <DateFilterSection
+              dateFrom={localFilters.dateFrom}
+              dateTo={localFilters.dateTo}
+              onDateFromChange={(date) => setLocalFilters(prev => ({ ...prev, dateFrom: date }))}
+              onDateToChange={(date) => setLocalFilters(prev => ({ ...prev, dateTo: date }))}
+            />
 
             <Separator className="my-6" />
 

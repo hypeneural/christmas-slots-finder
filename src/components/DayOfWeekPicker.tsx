@@ -3,10 +3,8 @@ import { Button } from './ui/button';
 import type { DayCode } from '../types';
 
 interface DayOfWeekPickerProps {
-  value: DayCode[];
+  selectedDays: DayCode[];
   onChange: (days: DayCode[]) => void;
-  onlyWeekends: boolean;
-  onToggleWeekends: (enabled: boolean) => void;
 }
 
 const DAYS: { code: DayCode; label: string; short: string }[] = [
@@ -20,38 +18,37 @@ const DAYS: { code: DayCode; label: string; short: string }[] = [
 ];
 
 export function DayOfWeekPicker({
-  value,
-  onChange,
-  onlyWeekends,
-  onToggleWeekends
+  selectedDays,
+  onChange
 }: DayOfWeekPickerProps) {
   // Ensure value is always an array
-  const safeValue = value || [];
-  const safeOnlyWeekends = onlyWeekends || false;
+  const safeValue = selectedDays || [];
 
   const handleDayToggle = (days: string[]) => {
     onChange(days as DayCode[]);
   };
 
   const handleWeekendsToggle = () => {
-    if (safeOnlyWeekends) {
-      onToggleWeekends(false);
+    if (safeValue.includes('Sat') && safeValue.includes('Sun') && safeValue.length === 2) {
+      // If only weekends are selected, clear all
       onChange([]);
     } else {
-      onToggleWeekends(true);
+      // Select only weekends
       onChange(['Sat', 'Sun']);
     }
   };
 
+  const isOnlyWeekends = safeValue.length === 2 && safeValue.includes('Sat') && safeValue.includes('Sun');
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-foreground">Dia da semana</h4>
+        <h4 className="text-sm font-medium text-foreground">Dias da Semana</h4>
         <Button
-          variant={safeOnlyWeekends ? 'default' : 'outline'}
+          variant={isOnlyWeekends ? 'default' : 'outline'}
           size="sm"
           onClick={handleWeekendsToggle}
-          className="text-sm"
+          className="text-sm h-8 px-3"
         >
           🎉 Só finais de semana
         </Button>
@@ -59,26 +56,25 @@ export function DayOfWeekPicker({
 
       <ToggleGroup
         type="multiple"
-        value={safeOnlyWeekends ? ['Sat', 'Sun'] : safeValue}
+        value={safeValue}
         onValueChange={handleDayToggle}
-        disabled={safeOnlyWeekends}
-        className="grid grid-cols-7 gap-1"
+        className="grid grid-cols-7 gap-2"
       >
         {DAYS.map((day) => (
           <ToggleGroupItem
             key={day.code}
             value={day.code}
             aria-label={day.label}
-            className="touch-target text-xs font-medium data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            className="h-10 w-10 text-xs font-medium data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm transition-all duration-200 hover:bg-muted/50"
           >
             {day.short}
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
 
-      {safeValue.length > 0 && !safeOnlyWeekends && (
+      {safeValue.length > 0 && (
         <p className="text-xs text-muted-foreground">
-          {safeValue.length} dias selecionados
+          {safeValue.length} dia{safeValue.length > 1 ? 's' : ''} selecionado{safeValue.length > 1 ? 's' : ''}
         </p>
       )}
     </div>

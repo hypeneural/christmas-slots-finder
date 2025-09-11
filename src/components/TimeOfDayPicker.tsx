@@ -60,6 +60,14 @@ export function TimeOfDayPicker({
 
   const handleTimeOfDayChange = (times: string[]) => {
     onTimeOfDayChange(times as TimeOfDay[]);
+    // Auto-disable other time filters when selecting time periods
+    if (times.length > 0) {
+      onToggleAfter18(false);
+      setUseCustomRange(false);
+      onTimeRangeChange(undefined);
+      setUseExactTime(false);
+      onExactTimeChange(undefined);
+    }
   };
 
   const handleAfter18Toggle = () => {
@@ -125,7 +133,7 @@ export function TimeOfDayPicker({
           variant={onlyAfter18 ? 'default' : 'outline'}
           size="sm"
           onClick={handleAfter18Toggle}
-          className="text-sm"
+          className="text-sm h-8 px-3"
         >
           🌙 Após 18h
         </Button>
@@ -139,7 +147,7 @@ export function TimeOfDayPicker({
             type="multiple"
             value={timeOfDay}
             onValueChange={handleTimeOfDayChange}
-            className="grid grid-cols-3 gap-2"
+            className="grid grid-cols-3 gap-3"
           >
             {TIME_OPTIONS.map((option) => {
               const Icon = option.icon;
@@ -147,9 +155,9 @@ export function TimeOfDayPicker({
                 <ToggleGroupItem
                   key={option.value}
                   value={option.value}
-                  className="touch-target flex-col gap-1 p-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  className="h-16 flex-col gap-1 p-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm transition-all duration-200 hover:bg-muted/50"
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-5 h-5" />
                   <span className="text-xs font-medium">{option.label}</span>
                   <span className="text-xs opacity-70">{option.time}</span>
                 </ToggleGroupItem>
@@ -168,6 +176,7 @@ export function TimeOfDayPicker({
             size="sm"
             onClick={handleCustomRangeToggle}
             disabled={onlyAfter18 || useExactTime}
+            className="h-8 px-3"
           >
             <Clock className="w-3 h-3 mr-1" />
             {useCustomRange ? 'Ativo' : 'Ativar'}
@@ -201,6 +210,7 @@ export function TimeOfDayPicker({
             size="sm"
             onClick={handleExactTimeToggle}
             disabled={onlyAfter18 || useCustomRange}
+            className="h-8 px-3"
           >
             🎯 {useExactTime ? 'Ativo' : 'Ativar'}
           </Button>
@@ -211,7 +221,7 @@ export function TimeOfDayPicker({
             type="time"
             value={exactTime || ''}
             onChange={(e) => handleExactTimeChange(e.target.value)}
-            className="touch-target"
+            className="h-10 text-base"
             placeholder="HH:MM"
           />
         )}

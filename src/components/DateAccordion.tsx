@@ -2,8 +2,9 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { TimePeriodSection } from './TimePeriodSection';
-import { Calendar, Clock, CalendarX, Sparkles, Star } from 'lucide-react';
+import { Calendar, Clock, CalendarX, Sparkles, Star, Flag } from 'lucide-react';
 import { categorizeTimeSlotsByPeriod } from '@/lib/scheduling';
+import { formatDateWithHoliday } from '@/lib/holidays';
 
 interface DateAccordionProps {
   slots: Record<string, string[]>;
@@ -29,8 +30,7 @@ export function DateAccordion({ slots, onSlotClick }: DateAccordionProps) {
       <Accordion type="multiple" className="w-full space-y-3">
         {sortedDates.map((dateStr, index) => {
           const date = parseISO(dateStr);
-          const dateLabel = format(date, 'dd/MM', { locale: ptBR });
-          const dayLabel = format(date, 'EEEE', { locale: ptBR });
+          const { dateLabel, dayLabel, holidayInfo } = formatDateWithHoliday(dateStr);
           const times = slots[dateStr];
 
           return (
@@ -67,12 +67,25 @@ export function DateAccordion({ slots, onSlotClick }: DateAccordionProps) {
                     <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full opacity-60 animate-pulse"></div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-base sm:text-lg font-bold text-foreground mb-1 group-hover:scale-105 transition-transform duration-300">
-                      {dateLabel}
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="text-base sm:text-lg font-bold text-foreground group-hover:scale-105 transition-transform duration-300">
+                        {dateLabel}
+                      </div>
+                      {holidayInfo && (
+                        <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-full">
+                          <Flag className="w-3 h-3 text-red-600" />
+                          <span className="text-xs font-semibold text-red-700">Feriado</span>
+                        </div>
+                      )}
                     </div>
                     <div className="text-xs sm:text-sm text-muted-foreground capitalize font-medium">
                       {dayLabel}
                     </div>
+                    {holidayInfo && (
+                      <div className="text-xs text-red-600 font-medium mt-1">
+                        {holidayInfo.name}
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col items-end gap-1.5 bg-gradient-to-r from-secondary/20 to-secondary/10 px-3 sm:px-4 py-2.5 rounded-xl border border-secondary/10 min-w-0 group-hover:scale-105 transition-transform duration-300">
                     <div className="flex items-center gap-2">
