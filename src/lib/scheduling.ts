@@ -220,7 +220,7 @@ export function buildWhatsAppDeepLink(
   dayLabel: string,
   time: string
 ): string {
-  const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '5548996425287';
+  const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '5548996553954';
   const message = `Oi, gostaria de agendar o horário do dia ${dateLabel} (${dayLabel}) às ${time}!`;
   const encodedMessage = encodeURIComponent(message);
   return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
