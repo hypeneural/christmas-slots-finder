@@ -6,10 +6,7 @@ import {
   Calendar, 
   CalendarDays, 
   Clock, 
-  Target, 
-  Check,
-  Sparkles,
-  Settings
+  Check
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -22,7 +19,6 @@ import { TimeOfDayPicker } from './TimeOfDayPicker';
 import { useTouchFeedback } from '@/hooks/useTouchFeedback';
 import { triggerHaptic, countActiveFilters } from '@/lib/filters';
 import { format, addDays, startOfDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { Filters } from '@/types';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -86,20 +82,28 @@ const SimpleFiltersModalComponent = ({
     }
   }, [open, filters]);
 
-  const dateOptions = useMemo(() => {
+  const { dateOptions, minDate } = useMemo(() => {
     const today = startOfDay(new Date());
-  const tomorrow = addDays(today, 1);
-  const nextWeek = addDays(today, 7);
-  const nextMonth = addDays(today, 30);
+    const tomorrow = addDays(today, 1);
+    const nextWeek = addDays(today, 7);
+    const nextMonth = addDays(today, 30);
+    const todayValue = format(today, 'yyyy-MM-dd');
 
-    return [
-    { value: '', label: 'Selecionar período', icon: '📅' },
-    { value: 'today', label: 'Hoje', date: format(today, 'yyyy-MM-dd'), icon: '📅' },
-    { value: 'tomorrow', label: 'Amanhã', date: format(tomorrow, 'yyyy-MM-dd'), icon: '📆' },
-    { value: 'week', label: 'Próximos 7 dias', dateFrom: format(today, 'yyyy-MM-dd'), dateTo: format(nextWeek, 'yyyy-MM-dd'), icon: '🗓️' },
-    { value: 'month', label: 'Próximos 30 dias', dateFrom: format(today, 'yyyy-MM-dd'), dateTo: format(nextMonth, 'yyyy-MM-dd'), icon: '📅' },
-    ];
+    return {
+      minDate: todayValue,
+      dateOptions: [
+        { value: '', label: 'Selecionar período' },
+        { value: 'today', label: 'Hoje', date: todayValue },
+        { value: 'tomorrow', label: 'Amanhã', date: format(tomorrow, 'yyyy-MM-dd') },
+        { value: 'week', label: 'Próximos 7 dias', dateFrom: todayValue, dateTo: format(nextWeek, 'yyyy-MM-dd') },
+        { value: 'month', label: 'Próximos 30 dias', dateFrom: todayValue, dateTo: format(nextMonth, 'yyyy-MM-dd') },
+      ],
+    };
   }, []);
+
+  const formatLocalDate = useCallback((date: string) => (
+    format(new Date(`${date}T12:00:00`), 'dd/MM/yyyy')
+  ), []);
 
   const handleApply = useCallback(() => {
     handleClickWithFeedback(() => {
@@ -157,8 +161,10 @@ const SimpleFiltersModalComponent = ({
           className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border/50 rounded-t-3xl shadow-2xl performance-optimized message-handler-optimized flex flex-col max-h-[90vh]"
         >
           <VisuallyHidden>
-            <h1>Filtros Avançados</h1>
-            <p>Modal para personalizar filtros de busca de horários disponíveis</p>
+            <Drawer.Title>Filtros Avançados</Drawer.Title>
+            <Drawer.Description>
+              Modal para personalizar filtros de busca de horários disponíveis.
+            </Drawer.Description>
           </VisuallyHidden>
           {/* Handle bar with drag indicator */}
           <div className="flex justify-center p-4 flex-shrink-0">
@@ -239,7 +245,7 @@ const SimpleFiltersModalComponent = ({
                 >
                   {dateOptions.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.icon} {option.label}
+                      {option.label}
                     </option>
                   ))}
                 </select>
@@ -258,7 +264,7 @@ const SimpleFiltersModalComponent = ({
                       value={localFilters.dateFrom || ''}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
                       className="h-12 text-base"
-                      min={format(today, 'yyyy-MM-dd')}
+                      min={minDate}
                     />
                   </div>
                   <div className="space-y-2">
@@ -271,7 +277,7 @@ const SimpleFiltersModalComponent = ({
                       value={localFilters.dateTo || ''}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, dateTo: e.target.value }))}
                       className="h-12 text-base"
-                      min={localFilters.dateFrom || format(today, 'yyyy-MM-dd')}
+                      min={localFilters.dateFrom || minDate}
                     />
                   </div>
                 </div>
@@ -282,9 +288,9 @@ const SimpleFiltersModalComponent = ({
                 <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
                   <p className="text-xs text-muted-foreground mb-1">Período selecionado:</p>
                   <p className="text-sm font-medium">
-                    {localFilters.dateFrom && `De: ${format(new Date(localFilters.dateFrom), 'dd/MM/yyyy')}`}
+                    {localFilters.dateFrom && `De: ${formatLocalDate(localFilters.dateFrom)}`}
                     {localFilters.dateFrom && localFilters.dateTo && ' • '}
-                    {localFilters.dateTo && `Até: ${format(new Date(localFilters.dateTo), 'dd/MM/yyyy')}`}
+                    {localFilters.dateTo && `Até: ${formatLocalDate(localFilters.dateTo)}`}
                   </p>
                 </div>
               )}
