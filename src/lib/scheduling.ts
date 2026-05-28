@@ -218,10 +218,19 @@ export function paginateDates(
 export function buildWhatsAppDeepLink(
   dateLabel: string,
   dayLabel: string,
-  time: string
+  time: string,
+  options: {
+    packageName?: string;
+    phoneNumber?: string;
+    template?: string;
+  } = {}
 ): string {
-  const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '5548998483594';
-  const message = `Oi, gostaria de agendar o horário do dia ${dateLabel} (${dayLabel}) às ${time}!`;
+  const phoneNumber = options.phoneNumber || import.meta.env.VITE_WHATSAPP_NUMBER || '5548998483594';
+  const message = (options.template || 'Oi, gostaria de agendar {packageName} no dia {date} ({dayLabel}) às {time}!')
+    .replace('{packageName}', options.packageName || 'minha sessão de Natal')
+    .replace('{date}', dateLabel)
+    .replace('{dayLabel}', dayLabel)
+    .replace('{time}', time);
   const encodedMessage = encodeURIComponent(message);
   return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 }

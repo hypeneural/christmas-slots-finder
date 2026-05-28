@@ -1,16 +1,20 @@
 import type { AvailabilityData, Package } from '../types';
 import {
+  fetchCrmCampaign,
   fetchCrmAvailability,
   fetchCrmPackages,
   isCrmAgendaApiEnabled,
+  isMockFallbackEnabled,
   type CrmAgendaFilters,
   type CrmAvailabilityResult,
+  type PublicCampaign,
 } from '../lib/crmAgendaApi';
 import mockData from '../mocks/availability.json';
 
 /**
  * Fetch availability data for a package
- * Uses real API when enabled, falls back to mock data
+ * Uses the CRM API by default. Mock fallback is explicit to avoid hiding
+ * production contract/configuration errors.
  */
 export async function fetchAvailability(packageSlug: string): Promise<AvailabilityData> {
   if (isCrmAgendaApiEnabled()) {
@@ -18,7 +22,11 @@ export async function fetchAvailability(packageSlug: string): Promise<Availabili
       const result = await fetchCrmAvailability(packageSlug);
       return result.data;
     } catch (error) {
-      console.error('CRM agenda API failed, falling back to mock data:', error);
+      if (!isMockFallbackEnabled()) {
+        throw error;
+      }
+
+      console.error('CRM agenda API failed, using explicit mock fallback:', error);
     }
   }
 
@@ -63,9 +71,30 @@ export async function fetchPackages(): Promise<Package[]> {
     try {
       return await fetchCrmPackages();
     } catch (error) {
-      console.error('CRM agenda packages failed, falling back to mock data:', error);
+      if (!isMockFallbackEnabled()) {
+        throw error;
+      }
+
+      console.error('CRM agenda packages failed, using explicit mock fallback:', error);
     }
   }
   
   return mockData.packages as Package[];
+}
+
+export async function fetchCampaignInfo(): Promise<PublicCampaign | null> {
+  if (!isCrmAgendaApiEnabled()) {
+    return null;
+  }
+
+  try {
+    return await fetchCrmCampaign();
+  } catch (error) {
+    if (!isMockFallbackEnabled()) {
+      throw error;
+    }
+
+    console.error('CRM agenda campaign failed, using explicit mock fallback:', error);
+    return null;
+  }
 }

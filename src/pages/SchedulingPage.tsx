@@ -70,6 +70,23 @@ export default function SchedulingPage() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
+  const isDirectWhatsAppFlow = isAlreadyPaid || packageMeta?.customerFlow?.mode === 'already_paid';
+  const cta = packageMeta?.cta;
+
+  const openWhatsAppForSlot = (slot: {
+    dateLabel: string;
+    dayLabel: string;
+    time: string;
+  }) => {
+    const whatsappUrl = buildWhatsAppDeepLink(slot.dateLabel, slot.dayLabel, slot.time, {
+      packageName: packageMeta?.name,
+      phoneNumber: stringFrom(cta?.whatsappNumber),
+      template: stringFrom(cta?.whatsappMessageTemplate),
+    });
+
+    window.open(whatsappUrl, '_blank');
+  };
+
   const handleSlotClick = (date: string, time: string) => {
     const parsedDate = parseISO(date);
     const dateLabel = format(parsedDate, 'dd/MM', { locale: ptBR });
@@ -78,9 +95,8 @@ export default function SchedulingPage() {
     setSelectedSlot({ date, time, dateLabel, dayLabel });
     
     // If user came with /pg in URL, redirect directly to WhatsApp
-    if (isAlreadyPaid) {
-      const whatsappUrl = buildWhatsAppDeepLink(dateLabel, dayLabel, time);
-      window.open(whatsappUrl, '_blank');
+    if (isDirectWhatsAppFlow) {
+      openWhatsAppForSlot({ dateLabel, dayLabel, time });
       return;
     }
     
@@ -92,12 +108,7 @@ export default function SchedulingPage() {
     if (!selectedSlot) return;
     
     setShowConfirmDialog(false);
-    const whatsappUrl = buildWhatsAppDeepLink(
-      selectedSlot.dateLabel,
-      selectedSlot.dayLabel,
-      selectedSlot.time
-    );
-    window.open(whatsappUrl, '_blank');
+    openWhatsAppForSlot(selectedSlot);
   };
 
   const handleWantToPay = () => {
@@ -172,7 +183,7 @@ export default function SchedulingPage() {
       <TopBanner packageSlug={packageSlug} onChangePackage={handleChangePackage} />
       
       {/* Already Paid Indicator */}
-      {isAlreadyPaid && (
+      {isDirectWhatsAppFlow && (
         <div className="mx-4 mb-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
@@ -252,9 +263,17 @@ export default function SchedulingPage() {
             dateLabel={selectedSlot.dateLabel}
             dayLabel={selectedSlot.dayLabel}
             time={selectedSlot.time}
+            packageName={packageMeta.name}
+            paymentUrl={stringFrom(cta?.paymentUrl)}
+            whatsappNumber={stringFrom(cta?.whatsappNumber)}
+            whatsappMessageTemplate={stringFrom(cta?.whatsappMessageTemplate)}
           />
         </>
       )}
     </div>
   );
+}
+
+function stringFrom(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() !== '' ? value : undefined;
 }

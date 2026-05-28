@@ -19,7 +19,7 @@ export function HeaderLogo() {
             <div className="relative p-6 rounded-3xl glass-card shadow-lg transition-all hover:scale-105 active:scale-95 duration-300 border border-white/5">
               <img 
                 src={logoImage} 
-                alt="Fotos de Natal - Sessões especiais 2025" 
+                alt="Fotos de Natal - Sessões especiais 2026"
                 className="w-24 h-24 sm:w-20 sm:h-20 object-contain drop-shadow-lg"
               />
             </div>
@@ -27,7 +27,7 @@ export function HeaderLogo() {
           
           <div className="mt-2">
             <p className="text-sm sm:text-xs font-bold text-primary drop-shadow-lg tracking-wide">
-              Sessões especiais 2025 🎄
+              Sessões especiais 2026 🎄
             </p>
           </div>
         </div>

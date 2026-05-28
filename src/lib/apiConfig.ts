@@ -10,13 +10,6 @@ export const API_CONFIG = {
   DEFAULT_TZ: 'America/Sao_Paulo',
   CAMPAIGN_SLUG: import.meta.env.VITE_AGENDA_CAMPAIGN_SLUG || 'natal',
   
-  // Mapeamento de slugs para códigos da API
-  PACKAGE_MAPPING: {
-    'ho-ho-ho': 'HOHOHO',
-    'entao-e-natal': 'ENTAO', 
-    'boas-festas': 'BOAS',
-  } as const,
-  
   // Configurações de paginação
   DEFAULT_PAGE_SIZE: 30,
   MAX_PAGE_SIZE: 100,
@@ -24,8 +17,6 @@ export const API_CONFIG = {
   // Configurações de cache
   CACHE_TTL: 5 * 60 * 1000, // 5 minutos
 } as const;
-
-export type PackageSlug = keyof typeof API_CONFIG.PACKAGE_MAPPING;
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -49,14 +40,14 @@ export function getApiBaseUrl(): string {
  * Obtém código do pacote da API baseado no slug
  */
 export function getPackageCodeFromSlug(slug: string): string | null {
-  return API_CONFIG.PACKAGE_MAPPING[slug as PackageSlug] || null;
+  return slug.trim() || null;
 }
 
 /**
  * Verifica se um slug de pacote é válido
  */
 export function isValidPackageSlug(slug: string): boolean {
-  return slug in API_CONFIG.PACKAGE_MAPPING;
+  return slug.trim().length > 0;
 }
 
 /**

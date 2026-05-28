@@ -16,6 +16,10 @@ interface OptimizedPaymentModalProps {
   dateLabel: string;
   dayLabel: string;
   time: string;
+  packageName?: string;
+  paymentUrl?: string;
+  whatsappNumber?: string;
+  whatsappMessageTemplate?: string;
 }
 
 const OptimizedPaymentModalComponent = ({
@@ -23,7 +27,11 @@ const OptimizedPaymentModalComponent = ({
   onOpenChange,
   dateLabel,
   dayLabel,
-  time
+  time,
+  packageName,
+  paymentUrl,
+  whatsappNumber,
+  whatsappMessageTemplate
 }: OptimizedPaymentModalProps) => {
   const [timerActive, setTimerActive] = useState(false);
 
@@ -37,22 +45,27 @@ const OptimizedPaymentModalComponent = ({
     // Use requestAnimationFrame for better performance
     requestAnimationFrame(() => {
       setTimeout(() => {
-        const paymentUrl = import.meta.env.VITE_PAYMENT_URL || 'https://evydencia.com/catalogo/natal';
-        window.open(paymentUrl, '_blank');
+        const url = paymentUrl || import.meta.env.VITE_PAYMENT_URL || 'https://evydencia.com/catalogo/natal';
+        window.open(url, '_blank');
       }, 0);
     });
-  }, []);
+  }, [paymentUrl]);
 
   const handleWhatsApp = useCallback(() => {
     // Use requestAnimationFrame for better performance
     requestAnimationFrame(() => {
       setTimeout(() => {
-        const message = `Olá! Gostaria de agendar uma sessão de fotos de Natal para ${dateLabel} (${dayLabel}) às ${time}.`;
-        const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(message)}`;
+        const message = (whatsappMessageTemplate || 'Olá! Quero agendar {packageName} no dia {date} ({dayLabel}) às {time}.')
+          .replace('{packageName}', packageName || 'minha sessão de Natal')
+          .replace('{date}', dateLabel)
+          .replace('{dayLabel}', dayLabel)
+          .replace('{time}', time);
+        const phone = whatsappNumber || import.meta.env.VITE_WHATSAPP_NUMBER || '5548998483594';
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
       }, 0);
     });
-  }, [dateLabel, dayLabel, time]);
+  }, [dateLabel, dayLabel, packageName, time, whatsappMessageTemplate, whatsappNumber]);
 
   // Timer effect
   useEffect(() => {

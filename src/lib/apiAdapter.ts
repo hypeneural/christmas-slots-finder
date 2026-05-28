@@ -14,7 +14,6 @@ import {
   type Holidays,
   type WeekAvailability,
 } from '../types';
-import { API_CONFIG, type PackageSlug } from './apiConfig';
 
 // ============================================================================
 // ADAPTER FUNCTIONS
@@ -27,9 +26,7 @@ export function adaptApiResponseToAvailabilityData(
   apiResponse: ApiSuccess,
   packageSlug: string
 ): AvailabilityData {
-  const packageCode = API_CONFIG.PACKAGE_MAPPING[packageSlug as PackageSlug];
-  
-  if (!packageCode) {
+  if (!packageSlug.trim()) {
     throw new Error(`Package slug not found: ${packageSlug}`);
   }
 
@@ -248,12 +245,12 @@ function getDayOfWeekFromDate(dateStr: string): keyof WeekAvailability {
  * Obtém código do pacote da API baseado no slug
  */
 export function getPackageCodeFromSlug(slug: string): string | null {
-  return API_CONFIG.PACKAGE_MAPPING[slug as PackageSlug] || null;
+  return slug.trim() || null;
 }
 
 /**
  * Verifica se um slug de pacote é válido
  */
 export function isValidPackageSlug(slug: string): boolean {
-  return slug in API_CONFIG.PACKAGE_MAPPING;
+  return slug.trim().length > 0;
 }

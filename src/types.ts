@@ -9,6 +9,27 @@ export interface Package {
   name: string;
   durationMinutes: number;
   badges?: string[];
+  subtitle?: string | null;
+  description?: string | null;
+  durationLabel?: string | null;
+  availabilityLabel?: string | null;
+  isFeatured?: boolean;
+  cta?: PackageCta;
+  customerFlow?: CustomerFlow;
+}
+
+export interface PackageCta {
+  mode?: string;
+  label?: string;
+  whatsappNumber?: string;
+  whatsappUrl?: string;
+  whatsappMessageTemplate?: string;
+  paymentUrl?: string;
+}
+
+export interface CustomerFlow {
+  mode?: string;
+  ctaMode?: string;
 }
 
 export interface Holiday { 

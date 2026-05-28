@@ -5,23 +5,45 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { HeaderLogo } from '../components/HeaderLogo';
 import { Clock, ExternalLink, MessageCircle } from 'lucide-react';
-import { fetchPackages } from '../services/api';
+import { fetchCampaignInfo, fetchPackages } from '../services/api';
 import { i18n } from '../lib/i18n';
 import type { Package } from '../types';
+import type { PublicCampaign } from '../lib/crmAgendaApi';
 
 export default function PackageSelection() {
   const [packages, setPackages] = useState<Package[]>([]);
+  const [campaign, setCampaign] = useState<PublicCampaign | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadPackages = async () => {
       try {
-        const data = await fetchPackages();
+        const campaignData = await fetchCampaignInfo();
+        const data = campaignData
+          ? campaignData.products.map((product, index) => ({
+              id: index + 1,
+              slug: product.slug,
+              name: product.name,
+              subtitle: product.subtitle ?? null,
+              description: product.description ?? null,
+              durationMinutes: product.durationMinutes ?? 0,
+              durationLabel: product.durationLabel ?? null,
+              availabilityLabel: product.availabilityLabel ?? null,
+              badges: product.badges ?? [],
+              isFeatured: product.isFeatured ?? false,
+              cta: product.cta as Package['cta'],
+              customerFlow: product.customerFlow as Package['customerFlow'],
+            }))
+          : await fetchPackages();
+
+        setCampaign(campaignData);
         setPackages(data);
       } catch (error) {
         console.error('Error loading packages:', error);
+        setError(error instanceof Error ? error.message : 'Não foi possível carregar os pacotes.');
       } finally {
         setLoading(false);
       }
@@ -44,7 +66,7 @@ export default function PackageSelection() {
   };
 
   const handleWhatsApp = () => {
-    const whatsappUrl = import.meta.env.VITE_WHATSAPP_URL || 'https://w.fotosdenatal.com/';
+    const whatsappUrl = stringFrom(campaign?.cta?.whatsappUrl) || import.meta.env.VITE_WHATSAPP_URL || 'https://w.fotosdenatal.com/';
     window.open(whatsappUrl, '_blank');
   };
 
@@ -69,12 +91,18 @@ export default function PackageSelection() {
       <div className="app-section">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-3">
-            {i18n.selectPackage}
+            {stringFrom(campaign?.copy?.packageSelectionTitle) || i18n.selectPackage}
           </h2>
           <p className="text-lg text-muted-foreground">
             Escolha seu pacote para ver os horários disponíveis
           </p>
         </div>
+
+        {error && (
+          <div className="max-w-md mx-auto mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            {error}
+          </div>
+        )}
 
         <div className="space-y-4 max-w-md mx-auto pb-40">
           {packages.map((pkg) => (
@@ -89,29 +117,53 @@ export default function PackageSelection() {
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl text-foreground font-bold">
-                    {pkg.name}
-                  </CardTitle>
-                  {pkg.badges && pkg.badges.length > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground text-xs font-bold shadow-button"
-                    >
-                      {pkg.badges[0]}
+                  <div>
+                    <CardTitle className="text-xl text-foreground font-bold">
+                      {pkg.name}
+                    </CardTitle>
+                    {pkg.subtitle && (
+                      <CardDescription className="mt-1">
+                        {pkg.subtitle}
+                      </CardDescription>
+                    )}
+                  </div>
+                  {pkg.isFeatured && (
+                    <Badge className="bg-primary text-primary-foreground text-xs font-bold shadow-button">
+                      Destaque
                     </Badge>
                   )}
                 </div>
               </CardHeader>
               
               <CardContent className="pb-6">
+                {pkg.description && (
+                  <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+                    {pkg.description}
+                  </p>
+                )}
+
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <div className="p-2 rounded-full bg-primary/20">
                     <Clock className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-base font-medium">
-                    {i18n.duration(pkg.durationMinutes)}
+                    {pkg.durationLabel || i18n.duration(pkg.durationMinutes)}
                   </span>
                 </div>
+
+                {pkg.badges && pkg.badges.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {pkg.badges.map((badge) => (
+                      <Badge
+                        key={badge}
+                        variant="secondary"
+                        className="bg-accent/90 text-accent-foreground text-xs font-bold shadow-button"
+                      >
+                        {badge}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 
                 {selectedPackage === pkg.slug && (
                   <div className="mt-4 flex items-center justify-center">
@@ -170,4 +222,8 @@ export default function PackageSelection() {
       </div>
     </div>
   );
+}
+
+function stringFrom(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() !== '' ? value : null;
 }

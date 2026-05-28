@@ -55,12 +55,6 @@ export function useInfiniteAvailability(
         categorized = result.categorized;
         pagination = result.pagination;
         
-        // Update pagination state
-        console.log('📄 Initial pagination info:', {
-          currentPage: pagination.currentPage,
-          totalPages: pagination.totalPages,
-          hasNextPage: pagination.hasNextPage
-        });
         setCurrentPage(pagination.currentPage);
         setTotalPages(pagination.totalPages);
         setHasNextPage(pagination.hasNextPage);
@@ -141,12 +135,6 @@ export function useInfiniteAvailability(
         const newCategorized = result.categorized;
         const pagination = result.pagination;
 
-        // Update pagination state
-        console.log('📄 Load more pagination info:', {
-          currentPage: pagination.currentPage,
-          totalPages: pagination.totalPages,
-          hasNextPage: pagination.hasNextPage
-        });
         setCurrentPage(pagination.currentPage);
         setTotalPages(pagination.totalPages);
         setHasNextPage(pagination.hasNextPage);
@@ -154,7 +142,6 @@ export function useInfiniteAvailability(
         // Merge new data with existing accumulated data and update view
         setAllCategorizedData(prevData => {
           if (!prevData) {
-            console.log('🔄 First page data:', Object.keys(newCategorized.all).length, 'dates');
             const paginated = {
               all: {
                 slots: newCategorized.all,
@@ -181,16 +168,12 @@ export function useInfiniteAvailability(
             return newCategorized;
           }
 
-          console.log('🔄 Merging data - Previous:', Object.keys(prevData.all).length, 'dates, New:', Object.keys(newCategorized.all).length, 'dates');
-
           const mergedData = {
             all: { ...prevData.all, ...newCategorized.all },
             afterHours: { ...prevData.afterHours, ...newCategorized.afterHours },
             saturdays: { ...prevData.saturdays, ...newCategorized.saturdays },
             sundaysHolidays: { ...prevData.sundaysHolidays, ...newCategorized.sundaysHolidays }
           };
-
-          console.log('🔄 Merged data:', Object.keys(mergedData.all).length, 'total dates');
 
           // Update paginated view with merged data - show ALL data for infinite scroll
           const paginated = {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AvailabilityData, Categorized, Filters, Package } from '../types';
+import type { AvailabilityData, Categorized, CustomerFlow, Filters, Package, PackageCta } from '../types';
 
 const HhMmSchema = z.string().regex(/^\d{2}:\d{2}$/);
 const IsoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -8,9 +8,16 @@ const PublicProductSchema = z.object({
   slug: z.string(),
   code: z.string().nullable().optional(),
   name: z.string(),
+  subtitle: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
   durationMinutes: z.number().nullable().optional(),
   bufferMinutes: z.number().nullable().optional(),
   badges: z.array(z.string()).nullable().optional(),
+  durationLabel: z.string().nullable().optional(),
+  availabilityLabel: z.string().nullable().optional(),
+  isFeatured: z.boolean().optional(),
+  cta: z.record(z.unknown()).optional(),
+  customerFlow: z.record(z.unknown()).optional(),
 });
 
 const PublicCampaignSchema = z.object({
@@ -22,6 +29,11 @@ const PublicCampaignSchema = z.object({
       endsOn: IsoDateSchema,
       timezone: z.string(),
     }),
+    theme: z.record(z.unknown()).optional(),
+    copy: z.record(z.unknown()).optional(),
+    customerFlow: z.record(z.unknown()).optional(),
+    cta: z.record(z.unknown()).optional(),
+    filters: z.record(z.unknown()).optional(),
     products: z.array(PublicProductSchema),
   }),
   meta: z.object({
@@ -129,6 +141,10 @@ export function isCrmAgendaApiEnabled(): boolean {
   return import.meta.env.VITE_USE_REAL_API !== 'false';
 }
 
+export function isMockFallbackEnabled(): boolean {
+  return import.meta.env.VITE_ENABLE_MOCK_FALLBACK === 'true';
+}
+
 export async function fetchCrmCampaign(
   campaignSlug: string = getCrmAgendaCampaignSlug(),
   baseUrl: string = getCrmAgendaBaseUrl()
@@ -159,13 +175,7 @@ export async function fetchCrmCampaign(
 export async function fetchCrmPackages(): Promise<Package[]> {
   const campaign = await fetchCrmCampaign();
 
-  return campaign.products.map((product, index) => ({
-    id: index + 1,
-    slug: product.slug,
-    name: product.name,
-    durationMinutes: product.durationMinutes ?? 0,
-    badges: product.badges ?? [],
-  }));
+  return campaign.products.map(mapPublicProductToPackage);
 }
 
 export async function fetchCrmAvailability(
@@ -256,11 +266,7 @@ function adaptCrmAvailability(
 ): CrmAvailabilityResult {
   const categorized = categorizeAvailabilityDays(availability.slotsByDate);
   const products = campaign.products.map((product, index) => ({
-    id: index + 1,
-    slug: product.slug,
-    name: product.name,
-    durationMinutes: product.durationMinutes ?? 0,
-    badges: product.badges ?? [],
+    ...mapPublicProductToPackage(product, index),
   }));
   const selectedProduct = products.find((product) => product.slug === availability.product.slug) ?? {
     id: 1,
@@ -303,6 +309,26 @@ function adaptCrmAvailability(
       hasNextPage: availability.pagination.hasNextPage,
       hasPrevPage: availability.pagination.currentPage > 1,
     },
+  };
+}
+
+function mapPublicProductToPackage(
+  product: PublicCampaign['products'][number],
+  index: number
+): Package {
+  return {
+    id: index + 1,
+    slug: product.slug,
+    name: product.name,
+    subtitle: product.subtitle ?? null,
+    description: product.description ?? null,
+    durationMinutes: product.durationMinutes ?? 0,
+    durationLabel: product.durationLabel ?? null,
+    availabilityLabel: product.availabilityLabel ?? null,
+    badges: product.badges ?? [],
+    isFeatured: product.isFeatured ?? false,
+    cta: product.cta as PackageCta | undefined,
+    customerFlow: product.customerFlow as CustomerFlow | undefined,
   };
 }
 

@@ -1,14 +1,6 @@
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-// Feriados brasileiros para 2025
-const BRAZILIAN_HOLIDAYS_2025 = {
-  '2025-10-12': 'Nossa Sr.a Aparecida - Padroeira do Brasil',
-  '2025-11-02': 'Finados',
-  '2025-11-15': 'Proclamação da República',
-  '2025-11-20': 'Dia Nacional de Zumbi e da Consciência Negra',
-};
-
 // Feriados móveis (calculados dinamicamente)
 const calculateEaster = (year: number): Date => {
   // Algoritmo de Gauss para calcular a Páscoa
@@ -61,7 +53,7 @@ const getFixedHolidays = (year: number): Record<string, string> => {
   holidays[`${year}-04-21`] = 'Tiradentes';
   holidays[`${year}-05-01`] = 'Dia do Trabalhador';
   holidays[`${year}-09-07`] = 'Independência do Brasil';
-  holidays[`${year}-10-12`] = 'Nossa Sr.a Aparecida - Padroeira do Brasil';
+  holidays[`${year}-10-12`] = 'Nossa Senhora Aparecida';
   holidays[`${year}-11-02`] = 'Finados';
   holidays[`${year}-11-15`] = 'Proclamação da República';
   holidays[`${year}-11-20`] = 'Dia Nacional de Zumbi e da Consciência Negra';
