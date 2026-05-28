@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { HeaderLogo } from '../components/HeaderLogo';
@@ -24,11 +24,7 @@ import type { CategoryKey } from '../types';
 export default function SchedulingPage() {
   const { packageSlug } = useParams<{ packageSlug: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Check if user came with /pg in URL (already paid)
-  const isAlreadyPaid = location.pathname.includes('/pg');
-  
+
   // Filters state
   const {
     filters,
@@ -40,16 +36,17 @@ export default function SchedulingPage() {
     openSheet,
     closeSheet
   } = useFilters();
-  
+
   // State for selected category
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey>('all');
-  
-  const { 
-    categorizedPaged, 
-    loading, 
+
+  const {
+    categorizedPaged,
+    loading,
     loadingMore,
-    error, 
-    packageMeta, 
+    error,
+    packageMeta,
+    availableFilters,
     loadMore,
     hasNextPage,
     currentPage,
@@ -59,18 +56,18 @@ export default function SchedulingPage() {
     30, // perPage - increased for mobile
     filters
   );
-  
+
   const [selectedSlot, setSelectedSlot] = useState<{
     date: string;
     time: string;
     dateLabel: string;
     dayLabel: string;
   } | null>(null);
-  
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
-  const isDirectWhatsAppFlow = isAlreadyPaid || packageMeta?.customerFlow?.mode === 'already_paid';
+  const isDirectWhatsAppFlow = packageMeta?.customerFlow?.mode === 'already_paid';
   const cta = packageMeta?.cta;
 
   const openWhatsAppForSlot = (slot: {
@@ -91,22 +88,21 @@ export default function SchedulingPage() {
     const parsedDate = parseISO(date);
     const dateLabel = format(parsedDate, 'dd/MM', { locale: ptBR });
     const dayLabel = format(parsedDate, 'EEEE', { locale: ptBR });
-    
+
     setSelectedSlot({ date, time, dateLabel, dayLabel });
-    
-    // If user came with /pg in URL, redirect directly to WhatsApp
+
     if (isDirectWhatsAppFlow) {
       openWhatsAppForSlot({ dateLabel, dayLabel, time });
       return;
     }
-    
+
     // Otherwise, show confirmation dialog
     setShowConfirmDialog(true);
   };
 
   const handleAlreadyPaid = () => {
     if (!selectedSlot) return;
-    
+
     setShowConfirmDialog(false);
     openWhatsAppForSlot(selectedSlot);
   };
@@ -179,29 +175,29 @@ export default function SchedulingPage() {
   return (
     <div className="app-container">
       <HeaderLogo />
-      
+
       <TopBanner packageSlug={packageSlug} onChangePackage={handleChangePackage} />
-      
-      {/* Already Paid Indicator */}
+
+      {/* Indicador do fluxo vindo do CRM. */}
       {isDirectWhatsAppFlow && (
         <div className="mx-4 mb-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">✓</span>
+              <span className="text-white font-bold text-sm">OK</span>
             </div>
             <div>
-              <h3 className="font-semibold text-green-800 text-base">Pagamento Confirmado</h3>
-              <p className="text-green-700 text-sm">Clique em qualquer horário para agendar diretamente no WhatsApp</p>
+              <h3 className="font-semibold text-green-800 text-base">Pagamento confirmado</h3>
+              <p className="text-green-700 text-sm">Clique em qualquer horario para agendar diretamente no WhatsApp</p>
             </div>
           </div>
         </div>
       )}
-      
-      <PackageInfo 
-        package={packageMeta} 
-        onChangePackage={isAlreadyPaid ? undefined : handleChangePackage} 
+
+      <PackageInfo
+        package={packageMeta}
+        onChangePackage={isDirectWhatsAppFlow ? undefined : handleChangePackage}
       />
-      
+
       <CompactControls
         categorizedPaged={categorizedPaged}
         selectedCategory={selectedCategory}
@@ -209,15 +205,16 @@ export default function SchedulingPage() {
         filters={filters}
         activeFiltersCount={activeCount}
         hasActiveFilters={hasActiveFilters}
+        availableFilters={availableFilters}
         onApplyFilters={setFilters}
         onClearFilters={clearFilters}
       />
-      
+
       <div className="app-section">
         <PullToRefresh onRefresh={handleRefresh}>
           {(() => {
             const categoryData = categorizedPaged[selectedCategory];
-            
+
             return (
               <InfiniteScrollContainer
                 hasMore={hasNextPage}
@@ -234,17 +231,18 @@ export default function SchedulingPage() {
           })()}
         </PullToRefresh>
       </div>
-      
+
       <FiltersSheet
         open={isSheetOpen}
         onOpenChange={closeSheet}
         filters={filters}
+        availableFilters={availableFilters}
         onApplyFilters={setFilters}
         onClearFilters={clearFilters}
       />
-      
+
       <WhatsAppFAB />
-      
+
       {selectedSlot && (
         <>
           <OptimizedTouchModal
@@ -256,7 +254,7 @@ export default function SchedulingPage() {
             onAlreadyPaid={handleAlreadyPaid}
             onWantToPay={handleWantToPay}
           />
-          
+
           <OptimizedPaymentModal
             open={showPaymentDialog}
             onOpenChange={setShowPaymentDialog}

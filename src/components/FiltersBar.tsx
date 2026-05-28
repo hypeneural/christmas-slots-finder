@@ -4,13 +4,14 @@ import { Badge } from './ui/badge';
 import { SimpleFiltersModal } from './SimpleFiltersModal';
 import { useTouchFeedback } from '@/hooks/useTouchFeedback';
 import { getFilterSummary } from '../lib/filters';
-import type { Filters } from '../types';
+import type { AvailableFilters, Filters } from '../types';
 import { useState } from 'react';
 
 interface FiltersBarProps {
   filters: Filters;
   activeCount: number;
   hasActiveFilters: boolean;
+  availableFilters?: AvailableFilters | null;
   onApplyFilters: (filters: Filters) => void;
   onClearFilters: () => void;
 }
@@ -19,6 +20,7 @@ export function FiltersBar({
   filters,
   activeCount,
   hasActiveFilters,
+  availableFilters,
   onApplyFilters,
   onClearFilters
 }: FiltersBarProps) {
@@ -93,6 +95,7 @@ export function FiltersBar({
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         filters={filters}
+        availableFilters={availableFilters}
         onApplyFilters={handleApplyFilters}
         onClearFilters={onClearFilters}
       />

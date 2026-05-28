@@ -5,7 +5,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
 import { Clock, Sun, Sunset, Moon } from 'lucide-react';
-import type { TimeOfDay } from '../types';
+import type { FilterOption, TimeOfDay } from '../types';
 
 interface TimeOfDayPickerProps {
   timeOfDay: TimeOfDay[];
@@ -16,12 +16,22 @@ interface TimeOfDayPickerProps {
   onExactTimeChange: (time: string | undefined) => void;
   onlyAfter18: boolean;
   onToggleAfter18: (enabled: boolean) => void;
+  timePeriodOptions?: FilterOption<TimeOfDay>[];
+  availableTimes?: string[];
+  hasAfterHours?: boolean;
 }
 
+const TIME_OPTION_META: Record<TimeOfDay, { label: string; icon: typeof Sun; time: string }> = {
+  morning: { label: 'Manhã', icon: Sun, time: '06-12h' },
+  afternoon: { label: 'Tarde', icon: Sunset, time: '12-18h' },
+  evening: { label: 'Noite', icon: Moon, time: '18-22h' },
+  after18: { label: 'Após 18h', icon: Moon, time: '18h+' },
+};
+
 const TIME_OPTIONS = [
-  { value: 'morning' as TimeOfDay, label: 'Manhã', icon: Sun, time: '06-12h' },
-  { value: 'afternoon' as TimeOfDay, label: 'Tarde', icon: Sun, time: '12-18h' },
-  { value: 'evening' as TimeOfDay, label: 'Noite', icon: Moon, time: '18-22h' },
+  { value: 'morning' as TimeOfDay, ...TIME_OPTION_META.morning },
+  { value: 'afternoon' as TimeOfDay, ...TIME_OPTION_META.afternoon },
+  { value: 'evening' as TimeOfDay, ...TIME_OPTION_META.evening },
 ];
 
 function timeToMinutes(timeStr: string): number {
@@ -43,7 +53,10 @@ export function TimeOfDayPicker({
   exactTime,
   onExactTimeChange,
   onlyAfter18,
-  onToggleAfter18
+  onToggleAfter18,
+  timePeriodOptions,
+  availableTimes,
+  hasAfterHours
 }: TimeOfDayPickerProps) {
   // Ensure all values are safe
   const safeTimeOfDay = timeOfDay || [];
@@ -53,6 +66,9 @@ export function TimeOfDayPicker({
 
   const [useCustomRange, setUseCustomRange] = useState(!!timeRange);
   const [useExactTime, setUseExactTime] = useState(!!exactTime);
+  const displayTimeOptions = buildTimeOptions(timePeriodOptions);
+  const afterHoursAvailable = hasAfterHours !== false;
+  const exactTimeOptions = availableTimes ?? [];
 
   const sliderValue = safeTimeRange 
     ? [timeToMinutes(safeTimeRange[0]), timeToMinutes(safeTimeRange[1])]
@@ -133,7 +149,9 @@ export function TimeOfDayPicker({
           variant={onlyAfter18 ? 'default' : 'outline'}
           size="sm"
           onClick={handleAfter18Toggle}
+          disabled={!afterHoursAvailable}
           className="text-sm h-8 px-3"
+          title={afterHoursAvailable ? undefined : 'Este pacote nao possui horarios apos o horario comercial no periodo atual.'}
         >
           🌙 Após 18h
         </Button>
@@ -149,7 +167,7 @@ export function TimeOfDayPicker({
             onValueChange={handleTimeOfDayChange}
             className="grid grid-cols-3 gap-3"
           >
-            {TIME_OPTIONS.map((option) => {
+            {displayTimeOptions.map((option) => {
               const Icon = option.icon;
               return (
                 <ToggleGroupItem
@@ -217,13 +235,27 @@ export function TimeOfDayPicker({
         </div>
 
         {useExactTime && (
-          <Input
-            type="time"
-            value={exactTime || ''}
-            onChange={(e) => handleExactTimeChange(e.target.value)}
-            className="h-10 text-base"
-            placeholder="HH:MM"
-          />
+          exactTimeOptions.length > 0 ? (
+            <select
+              value={exactTime || ''}
+              onChange={(e) => onExactTimeChange(e.target.value || undefined)}
+              className="w-full h-10 px-3 text-base bg-background border border-input rounded-md"
+              aria-label="Escolher horario exato"
+            >
+              <option value="">Escolha um horario disponivel</option>
+              {exactTimeOptions.map((time) => (
+                <option key={time} value={time}>{time}</option>
+              ))}
+            </select>
+          ) : (
+            <Input
+              type="time"
+              value={exactTime || ''}
+              onChange={(e) => handleExactTimeChange(e.target.value)}
+              className="h-10 text-base"
+              placeholder="HH:MM"
+            />
+          )
         )}
       </div>
 
@@ -234,7 +266,7 @@ export function TimeOfDayPicker({
           <p className="text-sm font-medium">
             {safeOnlyAfter18 && '🌙 Após 18h'}
             {safeTimeOfDay.length > 0 && safeTimeOfDay.map(t => 
-              TIME_OPTIONS.find(opt => opt.value === t)?.label
+              TIME_OPTION_META[t]?.label
             ).join(', ')}
             {useCustomRange && safeTimeRange && `${safeTimeRange[0]} - ${safeTimeRange[1]}`}
             {useExactTime && safeExactTime && `Exato: ${safeExactTime}`}
@@ -243,4 +275,25 @@ export function TimeOfDayPicker({
       )}
     </div>
   );
+}
+
+function buildTimeOptions(options: FilterOption<TimeOfDay>[] | undefined) {
+  if (!options?.length) {
+    return TIME_OPTIONS;
+  }
+
+  const mapped = options
+    .filter((option) => option.value !== 'after18')
+    .map((option) => {
+      const meta = TIME_OPTION_META[option.value];
+
+      return {
+        value: option.value,
+        label: option.label || meta.label,
+        icon: meta.icon,
+        time: meta.time,
+      };
+    });
+
+  return mapped.length > 0 ? mapped : TIME_OPTIONS;
 }

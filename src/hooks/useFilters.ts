@@ -15,6 +15,7 @@ function filtersToURL(filters: Filters): FiltersURLState {
   if (filters.dateTo) urlState.dt = filters.dateTo;
   if (filters.daysOfWeek?.length) urlState.dow = filters.daysOfWeek.join(',');
   if (filters.onlyWeekends) urlState.wknd = '1';
+  if (filters.onlyHolidays) urlState.hol = '1';
   if (filters.timeOfDay?.length) urlState.tod = filters.timeOfDay.join(',');
   if (filters.timeRange) urlState.tr = `${filters.timeRange[0]}-${filters.timeRange[1]}`;
   if (filters.onlyAfter18) urlState.a18 = '1';
@@ -34,6 +35,7 @@ function urlToFilters(urlState: FiltersURLState): Filters {
   if (urlState.dt) filters.dateTo = urlState.dt;
   if (urlState.dow) filters.daysOfWeek = urlState.dow.split(',') as DayCode[];
   if (urlState.wknd === '1') filters.onlyWeekends = true;
+  if (urlState.hol === '1') filters.onlyHolidays = true;
   if (urlState.tod) filters.timeOfDay = urlState.tod.split(',') as TimeOfDay[];
   if (urlState.tr) {
     const [start, end] = urlState.tr.split('-');
@@ -79,7 +81,7 @@ export function useFilters() {
     const newSearchParams = new URLSearchParams(searchParams);
     
     // Clear all filter params first
-    ['df', 'dt', 'dow', 'wknd', 'tod', 'tr', 'a18', 'xt', 'min'].forEach(key => {
+    ['df', 'dt', 'dow', 'wknd', 'hol', 'tod', 'tr', 'a18', 'xt', 'min'].forEach(key => {
       newSearchParams.delete(key);
     });
     

@@ -3,7 +3,7 @@ import { fetchAvailability, fetchAvailabilityWithFilters } from '../services/api
 import { buildAvailableSlots, categorizeSlots, paginateDates } from '../lib/scheduling';
 import { isRealApiEnabled } from '../lib/apiConfig';
 import type { CrmAvailabilityResult } from '../lib/crmAgendaApi';
-import type { CategorizedPaged, Package, AvailabilityData, Filters, CategoryKey, Categorized } from '../types';
+import type { CategorizedPaged, Package, AvailabilityData, Filters, CategoryKey, Categorized, AvailableFilters } from '../types';
 
 interface UseInfiniteAvailabilityResult {
   categorizedPaged: CategorizedPaged | null;
@@ -11,6 +11,7 @@ interface UseInfiniteAvailabilityResult {
   loadingMore: boolean;
   error: string | null;
   packageMeta: Package | null;
+  availableFilters: AvailableFilters | null;
   loadMore: (category: CategoryKey) => Promise<void>;
   refetch: () => void;
   hasNextPage: boolean;
@@ -28,6 +29,7 @@ export function useInfiniteAvailability(
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [packageMeta, setPackageMeta] = useState<Package | null>(null);
+  const [availableFilters, setAvailableFilters] = useState<AvailableFilters | null>(null);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,6 +60,7 @@ export function useInfiniteAvailability(
         setCurrentPage(pagination.currentPage);
         setTotalPages(pagination.totalPages);
         setHasNextPage(pagination.hasNextPage);
+        setAvailableFilters(result.availableFilters);
       } else {
         // Use mock data (existing logic)
         data = await fetchAvailability(packageSlug);
@@ -78,6 +81,7 @@ export function useInfiniteAvailability(
         setCurrentPage(1);
         setTotalPages(1);
         setHasNextPage(false);
+        setAvailableFilters(null);
       }
       
       // Find package metadata
@@ -116,6 +120,7 @@ export function useInfiniteAvailability(
       setError(err instanceof Error ? err.message : 'Erro ao carregar horários');
       setCategorizedPaged(null);
       setPackageMeta(null);
+      setAvailableFilters(null);
       setAllCategorizedData(null);
     } finally {
       setLoading(false);
@@ -138,6 +143,7 @@ export function useInfiniteAvailability(
         setCurrentPage(pagination.currentPage);
         setTotalPages(pagination.totalPages);
         setHasNextPage(pagination.hasNextPage);
+        setAvailableFilters(result.availableFilters);
 
         // Merge new data with existing accumulated data and update view
         setAllCategorizedData(prevData => {
@@ -230,6 +236,7 @@ export function useInfiniteAvailability(
     loadingMore,
     error,
     packageMeta,
+    availableFilters,
     loadMore,
     refetch: loadInitialData,
     hasNextPage,

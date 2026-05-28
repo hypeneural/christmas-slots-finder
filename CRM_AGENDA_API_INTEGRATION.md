@@ -70,14 +70,14 @@ Parametros usados:
 
 ## Melhorias ainda recomendadas no React
 
-1. Remover componentes de teste/debug expostos por rota (`/test-api`, `/simple-test`, `/validation-test`) antes de publicar em producao.
-2. Trocar o modo `/pg` por `customerFlow.mode` vindo do CRM.
-3. Expor o filtro `onlyHolidays` na UI quando `filters.available.hasHolidays=true`.
-4. Expor selects a partir de `filters.available.daysOfWeekOptions`, `timePeriodOptions`, `times` e `holidayDates`.
-5. Trocar `window.location.reload()` no pull-to-refresh por refetch real do hook.
-6. Usar TanStack Query de fato para cache/refetch de campanha e disponibilidade, ou remover `QueryClientProvider` se continuar com estado manual.
-7. Corrigir textos com encoding antigo que aparecem como `horÃ¡rios`, `DÃºvidas?` etc.
-8. Considerar code splitting porque o build avisa bundle JS acima de 500 kB.
+1. [x] Remover componentes de teste/debug expostos por rota (`/test-api`, `/simple-test`, `/validation-test`) antes de publicar em producao.
+2. [x] Trocar o modo `/pg` por `customerFlow.mode` vindo do CRM.
+3. [x] Expor o filtro `onlyHolidays` na UI quando `filters.available.hasHolidays=true`.
+4. [x] Expor selects a partir de `filters.available.daysOfWeekOptions`, `timePeriodOptions`, `times` e `holidayDates`.
+5. [ ] Trocar `window.location.reload()` no pull-to-refresh por refetch real do hook.
+6. [ ] Usar TanStack Query de fato para cache/refetch de campanha e disponibilidade, ou remover `QueryClientProvider` se continuar com estado manual.
+7. [ ] Revisar textos restantes com encoding antigo em arquivos legados nao renderizados no fluxo principal.
+8. [x] Aplicar code splitting; o build deixou de gerar aviso de bundle JS acima de 500 kB.
 
 ## Validacoes executadas
 
@@ -90,9 +90,8 @@ npm audit --omit=dev
 
 Resultado:
 
-- testes: `4 passed`, `27 passed`.
-- build: sucesso com Vite `5.4.21`.
-- audit: restaram vulnerabilidades moderadas em `vite/esbuild`; a correcao automatica exige `npm audit fix --force` e migraria para Vite 8, portanto ficou para uma tarefa separada de upgrade.
+- 2026-05-27: testes `4 passed`, `27 passed`; build Vite `5.4.21`; audit ainda apontava `vite/esbuild`.
+- 2026-05-28: testes `5 passed`, `29 passed`; lint ok; audit `0 vulnerabilities`; build Vite `8.0.14` com chunks abaixo de 500 kB.
 
 ## Checklist de deploy do React
 

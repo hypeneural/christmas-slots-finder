@@ -94,6 +94,7 @@ export function countActiveFilters(filters: Filters): number {
   if (filters.dateFrom || filters.dateTo) count++;
   if (filters.daysOfWeek?.length) count++;
   if (filters.onlyWeekends) count++;
+  if (filters.onlyHolidays) count++;
   if (filters.timeOfDay?.length) count++;
   if (filters.timeRange) count++;
   if (filters.onlyAfter18) count++;
@@ -132,6 +133,10 @@ export function getFilterSummary(filters: Filters): string[] {
     };
     const days = filters.daysOfWeek.map(d => dayLabels[d]).join(', ');
     chips.push(days);
+  }
+
+  if (filters.onlyHolidays) {
+    chips.push('Somente feriados');
   }
 
   // Time filters

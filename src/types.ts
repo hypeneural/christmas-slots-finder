@@ -3,6 +3,22 @@ export type DayCode = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat';
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'after18';
 export type CategoryKey = 'all' | 'afterHours' | 'saturdays' | 'sundaysHolidays';
 
+export interface FilterOption<TValue extends string = string> {
+  value: TValue;
+  label: string;
+}
+
+export interface AvailableFilters {
+  daysOfWeek: DayCode[];
+  daysOfWeekOptions: FilterOption<DayCode>[];
+  timePeriods: TimeOfDay[];
+  timePeriodOptions: FilterOption<TimeOfDay>[];
+  times: string[];
+  holidayDates: string[];
+  hasHolidays: boolean;
+  hasAfterHours: boolean;
+}
+
 export interface Package {
   id: number;
   slug: string;
@@ -141,6 +157,7 @@ export interface FiltersURLState {
   df?: string; dt?: string;      // dateFrom/dateTo
   dow?: string;                  // 'mon,tue,wed'
   wknd?: '0'|'1';
+  hol?: '0'|'1';
   tod?: string;                  // 'morning,after18'
   tr?: string;                   // '08:00-12:00'
   a18?: '0'|'1';

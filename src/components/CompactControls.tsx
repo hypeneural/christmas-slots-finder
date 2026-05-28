@@ -2,7 +2,7 @@ import { CategoryDropdown } from './CategoryDropdown';
 import { FiltersBar } from './FiltersBar';
 import { FloatingFilters } from './FloatingFilters';
 import { useStickyState } from '../hooks/useStickyState';
-import type { CategorizedPaged, CategoryKey, Filters } from '../types';
+import type { AvailableFilters, CategorizedPaged, CategoryKey, Filters } from '../types';
 
 interface CompactControlsProps {
   categorizedPaged: CategorizedPaged;
@@ -11,6 +11,7 @@ interface CompactControlsProps {
   filters: Filters;
   activeFiltersCount: number;
   hasActiveFilters: boolean;
+  availableFilters?: AvailableFilters | null;
   onApplyFilters: (filters: Filters) => void;
   onClearFilters: () => void;
 }
@@ -22,6 +23,7 @@ export function CompactControls({
   filters,
   activeFiltersCount,
   hasActiveFilters,
+  availableFilters,
   onApplyFilters,
   onClearFilters
 }: CompactControlsProps) {
@@ -58,6 +60,7 @@ export function CompactControls({
                 filters={filters}
                 activeCount={activeFiltersCount}
                 hasActiveFilters={hasActiveFilters}
+                availableFilters={availableFilters}
                 onApplyFilters={onApplyFilters}
                 onClearFilters={onClearFilters}
               />

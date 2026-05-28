@@ -96,6 +96,24 @@ const availabilityPayload = {
       checked: true,
       hasError: false,
     },
+    filters: {
+      available: {
+        daysOfWeek: ['Saturday'],
+        daysOfWeekOptions: [
+          { value: 'Saturday', label: 'Sábado' },
+        ],
+        timePeriods: ['morning', 'after_hours'],
+        timePeriodOptions: [
+          { value: 'morning', label: 'Manhã' },
+          { value: 'after_hours', label: 'Após horário comercial' },
+        ],
+        times: ['09:00', '18:00'],
+        holidayDates: ['2026-10-03'],
+        hasHolidays: true,
+        hasAfterHours: true,
+      },
+      applied: {},
+    },
   },
   meta: {
     apiVersion: '1.0.0',
@@ -211,6 +229,21 @@ describe('CRM public agenda API adapter', () => {
       currentPage: 2,
       hasNextPage: true,
       hasPrevPage: true,
+    });
+    expect(result.availableFilters).toEqual({
+      daysOfWeek: ['Sat'],
+      daysOfWeekOptions: [
+        { value: 'Sat', label: 'Sábado' },
+      ],
+      timePeriods: ['morning', 'after18'],
+      timePeriodOptions: [
+        { value: 'morning', label: 'Manhã' },
+        { value: 'after18', label: 'Após horário comercial' },
+      ],
+      times: ['09:00', '18:00'],
+      holidayDates: ['2026-10-03'],
+      hasHolidays: true,
+      hasAfterHours: true,
     });
   });
 });

@@ -1,10 +1,11 @@
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 import { Button } from './ui/button';
-import type { DayCode } from '../types';
+import type { DayCode, FilterOption } from '../types';
 
 interface DayOfWeekPickerProps {
   selectedDays: DayCode[];
   onChange: (days: DayCode[]) => void;
+  options?: FilterOption<DayCode>[];
 }
 
 const DAYS: { code: DayCode; label: string; short: string }[] = [
@@ -19,10 +20,12 @@ const DAYS: { code: DayCode; label: string; short: string }[] = [
 
 export function DayOfWeekPicker({
   selectedDays,
-  onChange
+  onChange,
+  options
 }: DayOfWeekPickerProps) {
   // Ensure value is always an array
   const safeValue = selectedDays || [];
+  const displayDays = buildDisplayDays(options, safeValue);
 
   const handleDayToggle = (days: string[]) => {
     onChange(days as DayCode[]);
@@ -60,7 +63,7 @@ export function DayOfWeekPicker({
         onValueChange={handleDayToggle}
         className="grid grid-cols-7 gap-2"
       >
-        {DAYS.map((day) => (
+        {displayDays.map((day) => (
           <ToggleGroupItem
             key={day.code}
             value={day.code}
@@ -79,4 +82,26 @@ export function DayOfWeekPicker({
       )}
     </div>
   );
+}
+
+function buildDisplayDays(
+  options: FilterOption<DayCode>[] | undefined,
+  selectedDays: DayCode[]
+): { code: DayCode; label: string; short: string }[] {
+  if (!options?.length) {
+    return DAYS;
+  }
+
+  const baseByCode = new Map(DAYS.map((day) => [day.code, day]));
+  const fromApi = options.map((option) => ({
+    code: option.value,
+    label: option.label,
+    short: baseByCode.get(option.value)?.short ?? option.label.slice(0, 3),
+  }));
+  const selectedMissing = selectedDays
+    .filter((day) => !fromApi.some((option) => option.code === day))
+    .map((day) => baseByCode.get(day))
+    .filter((day): day is { code: DayCode; label: string; short: string } => Boolean(day));
+
+  return [...fromApi, ...selectedMissing];
 }

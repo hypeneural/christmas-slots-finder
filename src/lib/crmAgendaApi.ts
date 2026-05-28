@@ -1,5 +1,15 @@
 import { z } from 'zod';
-import type { AvailabilityData, Categorized, CustomerFlow, Filters, Package, PackageCta } from '../types';
+import type {
+  AvailabilityData,
+  AvailableFilters,
+  Categorized,
+  CustomerFlow,
+  DayCode,
+  Filters,
+  Package,
+  PackageCta,
+  TimeOfDay,
+} from '../types';
 
 const HhMmSchema = z.string().regex(/^\d{2}:\d{2}$/);
 const IsoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -62,6 +72,22 @@ const AvailabilityDaySchema = z.object({
   slots: z.array(AvailabilitySlotSchema),
 });
 
+const FilterOptionSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
+const PublicAvailableFiltersSchema = z.object({
+  daysOfWeek: z.array(z.string()).optional(),
+  daysOfWeekOptions: z.array(FilterOptionSchema).optional(),
+  timePeriods: z.array(z.string()).optional(),
+  timePeriodOptions: z.array(FilterOptionSchema).optional(),
+  times: z.array(HhMmSchema).optional(),
+  holidayDates: z.array(IsoDateSchema).optional(),
+  hasHolidays: z.boolean().optional(),
+  hasAfterHours: z.boolean().optional(),
+}).passthrough();
+
 const PublicAvailabilitySchema = z.object({
   data: z.object({
     campaign: z.object({
@@ -89,6 +115,10 @@ const PublicAvailabilitySchema = z.object({
       checked: z.boolean(),
       hasError: z.boolean(),
     }),
+    filters: z.object({
+      available: PublicAvailableFiltersSchema.optional(),
+      applied: z.unknown().optional(),
+    }).optional(),
   }),
   meta: z.object({
     apiVersion: z.string(),
@@ -121,6 +151,7 @@ export interface CrmAvailabilityResult {
     hasNextPage: boolean;
     hasPrevPage: boolean;
   };
+  availableFilters: AvailableFilters;
 }
 
 const campaignCache = new Map<string, PublicCampaign>();
@@ -309,6 +340,7 @@ function adaptCrmAvailability(
       hasNextPage: availability.pagination.hasNextPage,
       hasPrevPage: availability.pagination.currentPage > 1,
     },
+    availableFilters: mapPublicAvailableFilters(availability.filters?.available),
   };
 }
 
@@ -394,6 +426,153 @@ function convertDayCodeToApiFormat(dayCode: string): string {
   };
 
   return dayMap[dayCode] || dayCode;
+}
+
+function mapPublicAvailableFilters(
+  available?: z.infer<typeof PublicAvailableFiltersSchema>
+): AvailableFilters {
+  const dayOptions = (available?.daysOfWeekOptions ?? [])
+    .map((option) => {
+      const value = convertApiDayToDayCode(option.value);
+
+      return value ? { value, label: option.label } : null;
+    })
+    .filter((option): option is { value: DayCode; label: string } => option !== null);
+
+  const daysFromList = (available?.daysOfWeek ?? [])
+    .map(convertApiDayToDayCode)
+    .filter((day): day is DayCode => day !== null);
+
+  const daysOfWeekOptions = uniqueByValue([
+    ...dayOptions,
+    ...daysFromList.map((day) => ({ value: day, label: dayCodeLabel(day) })),
+  ]);
+
+  const timeOptions = (available?.timePeriodOptions ?? [])
+    .map((option) => {
+      const value = convertApiTimePeriodToUi(option.value);
+
+      return value ? { value, label: option.label } : null;
+    })
+    .filter((option): option is { value: TimeOfDay; label: string } => option !== null);
+
+  const timePeriodsFromList = (available?.timePeriods ?? [])
+    .map(convertApiTimePeriodToUi)
+    .filter((period): period is TimeOfDay => period !== null);
+
+  const timePeriodOptions = uniqueByValue([
+    ...timeOptions,
+    ...timePeriodsFromList.map((period) => ({ value: period, label: timePeriodLabel(period) })),
+  ]);
+
+  return {
+    daysOfWeek: daysOfWeekOptions.map((option) => option.value),
+    daysOfWeekOptions,
+    timePeriods: timePeriodOptions.map((option) => option.value),
+    timePeriodOptions,
+    times: [...new Set(available?.times ?? [])].sort(),
+    holidayDates: [...new Set(available?.holidayDates ?? [])].sort(),
+    hasHolidays: available?.hasHolidays ?? (available?.holidayDates?.length ?? 0) > 0,
+    hasAfterHours: available?.hasAfterHours ?? timePeriodOptions.some((option) => option.value === 'after18'),
+  };
+}
+
+function convertApiDayToDayCode(value: string): DayCode | null {
+  const normalized = normalizeOptionValue(value);
+  const dayMap: Record<string, DayCode> = {
+    sunday: 'Sun',
+    domingo: 'Sun',
+    sun: 'Sun',
+    monday: 'Mon',
+    segunda: 'Mon',
+    segundafeira: 'Mon',
+    mon: 'Mon',
+    tuesday: 'Tue',
+    terca: 'Tue',
+    tercafeira: 'Tue',
+    tue: 'Tue',
+    wednesday: 'Wed',
+    quarta: 'Wed',
+    quartafeira: 'Wed',
+    wed: 'Wed',
+    thursday: 'Thu',
+    quinta: 'Thu',
+    quintafeira: 'Thu',
+    thu: 'Thu',
+    friday: 'Fri',
+    sexta: 'Fri',
+    sextafeira: 'Fri',
+    fri: 'Fri',
+    saturday: 'Sat',
+    sabado: 'Sat',
+    sat: 'Sat',
+  };
+
+  return dayMap[normalized] ?? null;
+}
+
+function convertApiTimePeriodToUi(value: string): TimeOfDay | null {
+  const normalized = normalizeOptionValue(value);
+  const periodMap: Record<string, TimeOfDay> = {
+    morning: 'morning',
+    manha: 'morning',
+    afternoon: 'afternoon',
+    tarde: 'afternoon',
+    evening: 'evening',
+    noite: 'evening',
+    afterhours: 'after18',
+    after18: 'after18',
+    apos18: 'after18',
+    aposhorariocomercial: 'after18',
+  };
+
+  return periodMap[normalized] ?? null;
+}
+
+function normalizeOptionValue(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toLowerCase();
+}
+
+function uniqueByValue<TValue extends string>(options: Array<{ value: TValue; label: string }>) {
+  const seen = new Set<TValue>();
+
+  return options.filter((option) => {
+    if (seen.has(option.value)) {
+      return false;
+    }
+
+    seen.add(option.value);
+    return true;
+  });
+}
+
+function dayCodeLabel(day: DayCode): string {
+  const labels: Record<DayCode, string> = {
+    Sun: 'Domingo',
+    Mon: 'Segunda-feira',
+    Tue: 'Terça-feira',
+    Wed: 'Quarta-feira',
+    Thu: 'Quinta-feira',
+    Fri: 'Sexta-feira',
+    Sat: 'Sábado',
+  };
+
+  return labels[day];
+}
+
+function timePeriodLabel(period: TimeOfDay): string {
+  const labels: Record<TimeOfDay, string> = {
+    morning: 'Manhã',
+    afternoon: 'Tarde',
+    evening: 'Noite',
+    after18: 'Após horário comercial',
+  };
+
+  return labels[period];
 }
 
 function convertTimeOfDayToApiFormat(timeOfDay: string): string {

@@ -16,13 +16,14 @@ import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { DayOfWeekPicker } from './DayOfWeekPicker';
 import { TimeOfDayPicker } from './TimeOfDayPicker';
-import type { Filters } from '../types';
+import type { AvailableFilters, Filters } from '../types';
 import { triggerHaptic, countActiveFilters } from '../lib/filters';
 
 interface FiltersSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   filters: Filters;
+  availableFilters?: AvailableFilters | null;
   onApplyFilters: (filters: Filters) => void;
   onClearFilters: () => void;
 }
@@ -38,6 +39,7 @@ export function FiltersSheet({
   open,
   onOpenChange,
   filters,
+  availableFilters,
   onApplyFilters,
   onClearFilters
 }: FiltersSheetProps) {
@@ -159,6 +161,47 @@ export function FiltersSheet({
                 />
               </div>
             </div>
+
+            {availableFilters?.hasHolidays && (
+              <div className="space-y-3 rounded-lg border border-border/50 bg-muted/20 p-3">
+                <Button
+                  type="button"
+                  variant={localFilters.onlyHolidays ? 'default' : 'outline'}
+                  onClick={() => setLocalFilters({
+                    ...localFilters,
+                    onlyHolidays: !localFilters.onlyHolidays,
+                  })}
+                  className="w-full justify-start"
+                >
+                  Somente feriados e datas especiais
+                </Button>
+
+                {availableFilters.holidayDates.length > 0 && (
+                  <select
+                    value={
+                      localFilters.dateFrom &&
+                      localFilters.dateFrom === localFilters.dateTo &&
+                      availableFilters.holidayDates.includes(localFilters.dateFrom)
+                        ? localFilters.dateFrom
+                        : ''
+                    }
+                    onChange={(event) => setLocalFilters({
+                      ...localFilters,
+                      dateFrom: event.target.value || undefined,
+                      dateTo: event.target.value || undefined,
+                      onlyHolidays: event.target.value ? true : localFilters.onlyHolidays,
+                    })}
+                    className="w-full h-10 px-3 text-base bg-background border border-input rounded-md"
+                    aria-label="Escolher data especial"
+                  >
+                    <option value="">Todas as datas especiais</option>
+                    {availableFilters.holidayDates.map((date) => (
+                      <option key={date} value={date}>{format(parseLocalDate(date), 'dd/MM/yyyy')}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
           </div>
 
           <Separator />
@@ -167,6 +210,7 @@ export function FiltersSheet({
           <DayOfWeekPicker
             selectedDays={localFilters.daysOfWeek || []}
             onChange={(days) => setLocalFilters({ ...localFilters, daysOfWeek: days.length > 0 ? days : undefined })}
+            options={availableFilters?.daysOfWeekOptions}
           />
 
           <Separator />
@@ -187,6 +231,9 @@ export function FiltersSheet({
               ...localFilters, 
               onlyAfter18: enabled || undefined 
             })}
+            timePeriodOptions={availableFilters?.timePeriodOptions}
+            availableTimes={availableFilters?.times}
+            hasAfterHours={availableFilters?.hasAfterHours}
           />
 
           <Separator />
@@ -248,4 +295,8 @@ export function FiltersSheet({
       </SheetContent>
     </Sheet>
   );
+}
+
+function parseLocalDate(date: string): Date {
+  return new Date(`${date}T12:00:00`);
 }

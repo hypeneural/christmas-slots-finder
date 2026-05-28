@@ -19,7 +19,7 @@ import { TimeOfDayPicker } from './TimeOfDayPicker';
 import { useTouchFeedback } from '@/hooks/useTouchFeedback';
 import { triggerHaptic, countActiveFilters } from '@/lib/filters';
 import { format, addDays, startOfDay } from 'date-fns';
-import type { Filters } from '@/types';
+import type { AvailableFilters, Filters } from '@/types';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 // VisuallyHidden component for accessibility
@@ -46,6 +46,7 @@ interface SimpleFiltersModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   filters: Filters;
+  availableFilters?: AvailableFilters | null;
   onApplyFilters: (filters: Filters) => void;
   onClearFilters: () => void;
 }
@@ -54,6 +55,7 @@ const SimpleFiltersModalComponent = ({
   open,
   onOpenChange,
   filters,
+  availableFilters,
   onApplyFilters,
   onClearFilters
 }: SimpleFiltersModalProps) => {
@@ -63,6 +65,7 @@ const SimpleFiltersModalComponent = ({
     timeRange: ['08:00', '18:00'],
     onlyAfter18: false,
     onlyWeekends: false,
+    onlyHolidays: false,
     ...filters
   });
   
@@ -77,6 +80,7 @@ const SimpleFiltersModalComponent = ({
         timeRange: ['08:00', '18:00'],
         onlyAfter18: false,
         onlyWeekends: false,
+        onlyHolidays: false,
         ...filters
       });
     }
@@ -121,7 +125,8 @@ const SimpleFiltersModalComponent = ({
         timeOfDay: [],
         timeRange: ['08:00', '18:00'],
         onlyAfter18: false,
-        onlyWeekends: false
+        onlyWeekends: false,
+        onlyHolidays: false
       });
       onClearFilters();
     });
@@ -208,6 +213,7 @@ const SimpleFiltersModalComponent = ({
               <DayOfWeekPicker
                 selectedDays={localFilters.daysOfWeek || []}
                 onChange={(days) => setLocalFilters(prev => ({ ...prev, daysOfWeek: days }))}
+                options={availableFilters?.daysOfWeekOptions}
               />
             </div>
 
@@ -283,6 +289,54 @@ const SimpleFiltersModalComponent = ({
                 </div>
               )}
 
+              {availableFilters?.hasHolidays && (
+                <div className="space-y-3 rounded-lg border border-border/50 bg-muted/20 p-3">
+                  <Button
+                    type="button"
+                    variant={localFilters.onlyHolidays ? 'default' : 'outline'}
+                    onClick={() => setLocalFilters(prev => ({
+                      ...prev,
+                      onlyHolidays: !prev.onlyHolidays,
+                    }))}
+                    className="w-full justify-start h-11"
+                  >
+                    Somente feriados e datas especiais
+                  </Button>
+
+                  {availableFilters.holidayDates.length > 0 && (
+                    <div className="space-y-2">
+                      <Label htmlFor="holidayDate" className="text-sm font-medium">
+                        Escolher uma data especial
+                      </Label>
+                      <select
+                        id="holidayDate"
+                        value={
+                          localFilters.dateFrom &&
+                          localFilters.dateFrom === localFilters.dateTo &&
+                          availableFilters.holidayDates.includes(localFilters.dateFrom)
+                            ? localFilters.dateFrom
+                            : ''
+                        }
+                        onChange={(event) => setLocalFilters(prev => ({
+                          ...prev,
+                          dateFrom: event.target.value || undefined,
+                          dateTo: event.target.value || undefined,
+                          onlyHolidays: event.target.value ? true : prev.onlyHolidays,
+                        }))}
+                        className="w-full h-11 px-3 text-base bg-background border border-input rounded-lg"
+                      >
+                        <option value="">Todas as datas especiais</option>
+                        {availableFilters.holidayDates.map((date) => (
+                          <option key={date} value={date}>
+                            {formatLocalDate(date)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Active Date Filter Summary */}
               {(localFilters.dateFrom || localFilters.dateTo) && (
                 <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
@@ -313,6 +367,9 @@ const SimpleFiltersModalComponent = ({
                 onExactTimeChange={(exactTime) => setLocalFilters(prev => ({ ...prev, exactTime }))}
                 onlyAfter18={localFilters.onlyAfter18 || false}
                 onToggleAfter18={(onlyAfter18) => setLocalFilters(prev => ({ ...prev, onlyAfter18 }))}
+                timePeriodOptions={availableFilters?.timePeriodOptions}
+                availableTimes={availableFilters?.times}
+                hasAfterHours={availableFilters?.hasAfterHours}
               />
             </div>
             
