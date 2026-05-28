@@ -4,10 +4,11 @@
 
 // Configuração simples sem dependências externas
 export const API_CONFIG = {
-  BASE_URL: 'https://horarios.fotosdenatal.com/app.php',
-  USE_REAL_API: true, // Mude para false para usar dados mock
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://evydencia.com/api/public/v1/agenda',
+  USE_REAL_API: import.meta.env.VITE_USE_REAL_API !== 'false',
   TIMEOUT_MS: 15000,
   DEFAULT_TZ: 'America/Sao_Paulo',
+  CAMPAIGN_SLUG: import.meta.env.VITE_AGENDA_CAMPAIGN_SLUG || 'natal',
   
   // Mapeamento de slugs para códigos da API
   PACKAGE_MAPPING: {

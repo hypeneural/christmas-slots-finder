@@ -62,6 +62,7 @@ export interface Filters {
   dateTo?: string;            // YYYY-MM-DD
   daysOfWeek?: DayCode[];     // multi-select
   onlyWeekends?: boolean;
+  onlyHolidays?: boolean;
   timeOfDay?: TimeOfDay[];    // ['morning','after18'] etc.
   timeRange?: [string, string]; // ['HH:mm','HH:mm']
   onlyAfter18?: boolean;      // atalho

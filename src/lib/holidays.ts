@@ -81,7 +81,7 @@ export const isHoliday = (date: string | Date): string | null => {
   if (typeof date === 'string') {
     dateStr = date;
   } else {
-    dateStr = format(date, 'yyyy-MM-dd');
+    dateStr = date.toISOString().slice(0, 10);
   }
   
   // Extrair o ano da data

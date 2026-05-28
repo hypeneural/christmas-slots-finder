@@ -1,44 +1,24 @@
 import type { AvailabilityData, Package } from '../types';
-import { AvailabilityClient } from '../lib/availabilityClient';
-import { 
-  adaptApiResponseToAvailabilityData, 
-  adaptApiResponseToCategorized,
-  adaptFiltersToApiFilters,
-  getPackageCodeFromSlug, 
-  isValidPackageSlug 
-} from '../lib/apiAdapter';
-import { API_CONFIG, isRealApiEnabled, getApiBaseUrl } from '../lib/apiConfig';
+import {
+  fetchCrmAvailability,
+  fetchCrmPackages,
+  isCrmAgendaApiEnabled,
+  type CrmAgendaFilters,
+  type CrmAvailabilityResult,
+} from '../lib/crmAgendaApi';
 import mockData from '../mocks/availability.json';
-
-const client = new AvailabilityClient({
-  baseUrl: getApiBaseUrl(),
-  timeoutMs: API_CONFIG.TIMEOUT_MS,
-  defaultTZ: API_CONFIG.DEFAULT_TZ,
-});
 
 /**
  * Fetch availability data for a package
  * Uses real API when enabled, falls back to mock data
  */
 export async function fetchAvailability(packageSlug: string): Promise<AvailabilityData> {
-  // Check if package slug is valid
-  if (!isValidPackageSlug(packageSlug)) {
-    throw new Error(`Invalid package slug: ${packageSlug}`);
-  }
-
-  // Use real API if enabled
-  if (isRealApiEnabled()) {
+  if (isCrmAgendaApiEnabled()) {
     try {
-      const packageCode = getPackageCodeFromSlug(packageSlug);
-      if (!packageCode) {
-        throw new Error(`Package code not found for slug: ${packageSlug}`);
-      }
-
-      const apiResponse = await client.getAvailability(packageCode);
-      return adaptApiResponseToAvailabilityData(apiResponse, packageSlug);
+      const result = await fetchCrmAvailability(packageSlug);
+      return result.data;
     } catch (error) {
-      console.error('Real API failed, falling back to mock data:', error);
-      // Fall through to mock data
+      console.error('CRM agenda API failed, falling back to mock data:', error);
     }
   }
 
@@ -63,44 +43,12 @@ export async function fetchAvailability(packageSlug: string): Promise<Availabili
  */
 export async function fetchAvailabilityWithFilters(
   packageSlug: string, 
-  filters?: any,
+  filters?: CrmAgendaFilters,
   page: number = 1,
   perPage: number = 30
-): Promise<{ data: AvailabilityData; categorized: any; pagination: any }> {
-  if (!isValidPackageSlug(packageSlug)) {
-    throw new Error(`Invalid package slug: ${packageSlug}`);
-  }
-
-  const packageCode = getPackageCodeFromSlug(packageSlug);
-  if (!packageCode) {
-    throw new Error(`Package code not found for slug: ${packageSlug}`);
-  }
-
+): Promise<CrmAvailabilityResult> {
   try {
-    // Convert filters to API format
-    const apiFilters = adaptFiltersToApiFilters(filters);
-    apiFilters.page = page;
-    apiFilters.perPage = perPage;
-
-    // Fetch from real API
-    const apiResponse = await client.getAvailability(packageCode, apiFilters);
-    
-    // Convert to template format
-    const availabilityData = adaptApiResponseToAvailabilityData(apiResponse, packageSlug);
-    const categorized = adaptApiResponseToCategorized(apiResponse);
-    
-    return {
-      data: availabilityData,
-      categorized,
-      pagination: {
-        currentPage: apiResponse.pagination.currentPage,
-        totalPages: apiResponse.pagination.totalPages,
-        perPage: apiResponse.pagination.perPage,
-        totalDays: apiResponse.pagination.totalDays,
-        hasNextPage: apiResponse.pagination.hasNextPage,
-        hasPrevPage: apiResponse.pagination.hasPrevPage,
-      }
-    };
+    return await fetchCrmAvailability(packageSlug, filters, page, perPage);
   } catch (error) {
     console.error('Failed to fetch availability with filters:', error);
     throw error;
@@ -111,11 +59,13 @@ export async function fetchAvailabilityWithFilters(
  * Fetch all packages
  */
 export async function fetchPackages(): Promise<Package[]> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 200));
-  
-  // For now, always return mock data for packages
-  // In the future, this could be replaced with a real API call
+  if (isCrmAgendaApiEnabled()) {
+    try {
+      return await fetchCrmPackages();
+    } catch (error) {
+      console.error('CRM agenda packages failed, falling back to mock data:', error);
+    }
+  }
   
   return mockData.packages as Package[];
 }

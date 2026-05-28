@@ -404,6 +404,10 @@ export class AvailabilityClient {
         ...init,
         signal,
       });
+
+      if (signal.aborted) {
+        throw new Error(`Request timeout after ${this.timeoutMs}ms`);
+      }
       
       clearTimeout(timeoutId);
       return await this.processResponse(response);
