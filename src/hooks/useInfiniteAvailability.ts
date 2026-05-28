@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { fetchAvailability, fetchAvailabilityWithFilters } from '../services/api';
 import { buildAvailableSlots, categorizeSlots, paginateDates } from '../lib/scheduling';
 import { isRealApiEnabled } from '../lib/apiConfig';
+import type { CrmAvailabilityResult } from '../lib/crmAgendaApi';
 import type { CategorizedPaged, Package, AvailabilityData, Filters, CategoryKey, Categorized } from '../types';
 
 interface UseInfiniteAvailabilityResult {
@@ -36,7 +37,7 @@ export function useInfiniteAvailability(
   // Store all accumulated categorized data for infinite loading
   const [allCategorizedData, setAllCategorizedData] = useState<Categorized | null>(null);
 
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     if (!packageSlug) return;
 
     setLoading(true);
@@ -45,7 +46,7 @@ export function useInfiniteAvailability(
     try {
       let data: AvailabilityData;
       let categorized: Categorized;
-      let pagination: any = null;
+      let pagination: CrmAvailabilityResult['pagination'] | null = null;
 
       if (isRealApiEnabled()) {
         // Use real API with filters
@@ -125,7 +126,7 @@ export function useInfiniteAvailability(
     } finally {
       setLoading(false);
     }
-  };
+  }, [packageSlug, filters, perPage]);
 
   const loadMore = useCallback(async (category: CategoryKey) => {
     if (!hasNextPage || loadingMore || !packageSlug) return;
@@ -234,11 +235,11 @@ export function useInfiniteAvailability(
     } finally {
       setLoadingMore(false);
     }
-  }, [hasNextPage, currentPage, loadingMore, packageSlug, filters, perPage, allCategorizedData]);
+  }, [hasNextPage, currentPage, loadingMore, packageSlug, filters, perPage]);
 
   useEffect(() => {
     loadInitialData();
-  }, [packageSlug, filters]);
+  }, [loadInitialData]);
 
   return {
     categorizedPaged,

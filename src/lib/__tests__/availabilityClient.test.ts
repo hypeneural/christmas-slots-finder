@@ -329,8 +329,8 @@ describe('AvailabilityClient', () => {
   describe('arrayToCsv', () => {
     it('should convert arrays to CSV format', () => {
       const client = new AvailabilityClient();
-      // Access private method for testing
-      const arrayToCsv = (client as any).arrayToCsv.bind(client);
+      type ClientWithArrayToCsv = { arrayToCsv(values: string[]): string };
+      const arrayToCsv = (client as unknown as ClientWithArrayToCsv).arrayToCsv.bind(client);
       
       expect(arrayToCsv(['Monday', 'Tuesday', 'Friday'])).toBe('Monday,Tuesday,Friday');
       expect(arrayToCsv(['morning', 'afternoon'])).toBe('morning,afternoon');

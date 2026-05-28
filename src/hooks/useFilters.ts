@@ -69,6 +69,8 @@ export function useFilters() {
         console.warn('Failed to load saved filters:', error);
       }
     }
+    // Intentionally load the initial URL snapshot once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update URL when filters change
@@ -118,7 +120,7 @@ export function useFilters() {
     triggerHaptic('light');
   }, [updateURL, saveToStorage]);
 
-  const updateFilter = useCallback((key: keyof Filters, value: any) => {
+  const updateFilter = useCallback((key: keyof Filters, value: Filters[keyof Filters] | null | '') => {
     const newFilters = { ...filters, [key]: value };
     if (value === undefined || value === null || value === '') {
       delete newFilters[key];

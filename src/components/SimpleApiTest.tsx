@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 
+interface LegacyApiResponse {
+  success?: boolean;
+  package?: {
+    name?: string;
+    code?: string;
+  };
+  processedSlots?: {
+    all?: Record<string, string[]>;
+  };
+  [key: string]: unknown;
+}
+
 export function SimpleApiTest() {
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<LegacyApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +36,7 @@ export function SimpleApiTest() {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      const data = await response.json();
+      const data = await response.json() as LegacyApiResponse;
       console.log('API Response:', data);
       
       setResult(data);
@@ -72,7 +84,7 @@ export function SimpleApiTest() {
               <p><strong>Package:</strong> {result.package.name} ({result.package.code})</p>
             )}
             {result.processedSlots && (
-              <p><strong>Slots disponíveis:</strong> {Object.keys(result.processedSlots.all).length} datas</p>
+              <p><strong>Slots disponíveis:</strong> {Object.keys(result.processedSlots.all ?? {}).length} datas</p>
             )}
           </div>
           

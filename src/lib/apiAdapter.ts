@@ -1,5 +1,19 @@
-import { ApiSuccess } from './availabilityClient';
-import { AvailabilityData, Package, Availability, Categorized } from '../types';
+import {
+  ApiSuccess,
+  type DayCode as ApiDayCode,
+  type PeriodCode,
+  type QueryFilters,
+} from './availabilityClient';
+import {
+  AvailabilityData,
+  Package,
+  Availability,
+  Categorized,
+  type BusyEvent,
+  type Filters,
+  type Holidays,
+  type WeekAvailability,
+} from '../types';
 import { API_CONFIG, type PackageSlug } from './apiConfig';
 
 // ============================================================================
@@ -62,8 +76,8 @@ export function adaptApiResponseToCategorized(apiResponse: ApiSuccess): Categori
 /**
  * Converte filtros do template para filtros da API
  */
-export function adaptFiltersToApiFilters(filters: any) {
-  const apiFilters: any = {};
+export function adaptFiltersToApiFilters(filters: Filters): QueryFilters {
+  const apiFilters: QueryFilters = {};
 
   // Mapear dateFrom/dateTo
   if (filters.dateFrom) {
@@ -75,7 +89,7 @@ export function adaptFiltersToApiFilters(filters: any) {
 
   // Mapear daysOfWeek (converter de formato abreviado para completo)
   if (filters.daysOfWeek && filters.daysOfWeek.length > 0) {
-    apiFilters.daysOfWeek = filters.daysOfWeek.map((day: string) => 
+    apiFilters.daysOfWeek = filters.daysOfWeek.map((day) =>
       convertDayCodeToApiFormat(day)
     );
   }
@@ -87,7 +101,7 @@ export function adaptFiltersToApiFilters(filters: any) {
 
   // Mapear timeOfDay
   if (filters.timeOfDay && filters.timeOfDay.length > 0) {
-    apiFilters.timeOfDay = filters.timeOfDay.map((period: string) => 
+    apiFilters.timeOfDay = filters.timeOfDay.map((period) =>
       convertTimeOfDayToApiFormat(period)
     );
   }
@@ -139,8 +153,8 @@ function getPackageBadges(packageCode: string): string[] {
 /**
  * Converte slots da API para formato WeekAvailability
  */
-function convertSlotsToWeekAvailability(slots: Record<string, string[]>): any {
-  const weekAvailability: any = {
+function convertSlotsToWeekAvailability(slots: Record<string, string[]>): WeekAvailability {
+  const weekAvailability: WeekAvailability = {
     Monday: [],
     Tuesday: [],
     Wednesday: [],
@@ -164,8 +178,8 @@ function convertSlotsToWeekAvailability(slots: Record<string, string[]>): any {
 /**
  * Converte feriados da API para formato do template
  */
-function convertHolidaysFromApi(sundaysHolidays: Record<string, string[]>): Record<string, any> {
-  const holidays: Record<string, any> = {};
+function convertHolidaysFromApi(sundaysHolidays: Record<string, string[]>): Holidays {
+  const holidays: Holidays = {};
   
   Object.entries(sundaysHolidays).forEach(([date, times]) => {
     if (times.length > 0) {
@@ -182,7 +196,7 @@ function convertHolidaysFromApi(sundaysHolidays: Record<string, string[]>): Reco
 /**
  * Converte eventos ignorados do Google Calendar para BusyEvent
  */
-function convertIgnoredEventsToBusyEvents(ignoredEvents: any[]): any[] {
+function convertIgnoredEventsToBusyEvents(ignoredEvents: ApiSuccess['googleCalendar']['ignoredEvents']): BusyEvent[] {
   return ignoredEvents.map(event => ({
     start: event.start,
     end: event.end,
@@ -193,8 +207,8 @@ function convertIgnoredEventsToBusyEvents(ignoredEvents: any[]): any[] {
 /**
  * Converte código de dia abreviado para formato da API
  */
-function convertDayCodeToApiFormat(dayCode: string): string {
-  const dayMap: Record<string, string> = {
+function convertDayCodeToApiFormat(dayCode: string): ApiDayCode {
+  const dayMap: Record<string, ApiDayCode> = {
     'Mon': 'Monday',
     'Tue': 'Tuesday', 
     'Wed': 'Wednesday',
@@ -204,29 +218,29 @@ function convertDayCodeToApiFormat(dayCode: string): string {
     'Sun': 'Sunday',
   };
   
-  return dayMap[dayCode] || dayCode;
+  return dayMap[dayCode] || (dayCode as ApiDayCode);
 }
 
 /**
  * Converte período do dia para formato da API
  */
-function convertTimeOfDayToApiFormat(timeOfDay: string): string {
-  const periodMap: Record<string, string> = {
+function convertTimeOfDayToApiFormat(timeOfDay: string): PeriodCode {
+  const periodMap: Record<string, PeriodCode> = {
     'morning': 'morning',
     'afternoon': 'afternoon', 
     'evening': 'evening',
     'after18': 'evening', // after18 mapeia para evening na API
   };
   
-  return periodMap[timeOfDay] || timeOfDay;
+  return periodMap[timeOfDay] || (timeOfDay as PeriodCode);
 }
 
 /**
  * Obtém dia da semana a partir de uma data
  */
-function getDayOfWeekFromDate(dateStr: string): string {
+function getDayOfWeekFromDate(dateStr: string): keyof WeekAvailability {
   const date = new Date(dateStr);
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const days: Array<keyof WeekAvailability> = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   return days[date.getDay()];
 }
 

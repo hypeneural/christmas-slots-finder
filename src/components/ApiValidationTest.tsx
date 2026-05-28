@@ -1,7 +1,43 @@
 import React, { useState } from 'react';
 
+interface LegacyApiResponse {
+  timestamp?: string;
+  metadata?: {
+    generatedAt?: string;
+  };
+  package?: {
+    name?: string;
+    code?: string;
+  };
+  processedSlots?: {
+    all?: Record<string, string[]>;
+  };
+  pagination?: {
+    currentPage?: number;
+    totalPages?: number;
+  };
+  [key: string]: unknown;
+}
+
+interface ApiValidationResult {
+  success: boolean;
+  data: LegacyApiResponse;
+  validation: {
+    timestamp: {
+      value?: string;
+      isValid: boolean;
+      parsed: string;
+    };
+    generatedAt: {
+      value?: string;
+      isValid: boolean;
+      parsed: string;
+    };
+  };
+}
+
 export function ApiValidationTest() {
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ApiValidationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +61,7 @@ export function ApiValidationTest() {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      const data = await response.json();
+      const data = await response.json() as LegacyApiResponse;
       console.log('Raw API Response:', data);
       
       // Teste de validação manual dos campos problemáticos
@@ -122,9 +158,9 @@ export function ApiValidationTest() {
             <div>
               <h3 className="font-semibold mb-2">Dados da API:</h3>
               <div className="text-sm">
-                <p><strong>Package:</strong> {result.data.package.name} ({result.data.package.code})</p>
-                <p><strong>Slots disponíveis:</strong> {Object.keys(result.data.processedSlots.all).length} datas</p>
-                <p><strong>Paginação:</strong> Página {result.data.pagination.currentPage} de {result.data.pagination.totalPages}</p>
+                <p><strong>Package:</strong> {result.data.package?.name} ({result.data.package?.code})</p>
+                <p><strong>Slots disponíveis:</strong> {Object.keys(result.data.processedSlots?.all ?? {}).length} datas</p>
+                <p><strong>Paginação:</strong> Página {result.data.pagination?.currentPage} de {result.data.pagination?.totalPages}</p>
               </div>
             </div>
           </div>

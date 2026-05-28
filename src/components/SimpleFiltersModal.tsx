@@ -24,7 +24,7 @@ import { triggerHaptic, countActiveFilters } from '@/lib/filters';
 import { format, addDays, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Filters } from '@/types';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 // VisuallyHidden component for accessibility
 const VisuallyHidden = ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
@@ -86,18 +86,20 @@ const SimpleFiltersModalComponent = ({
     }
   }, [open, filters]);
 
-  const today = startOfDay(new Date());
+  const dateOptions = useMemo(() => {
+    const today = startOfDay(new Date());
   const tomorrow = addDays(today, 1);
   const nextWeek = addDays(today, 7);
   const nextMonth = addDays(today, 30);
 
-  const dateOptions = [
+    return [
     { value: '', label: 'Selecionar período', icon: '📅' },
     { value: 'today', label: 'Hoje', date: format(today, 'yyyy-MM-dd'), icon: '📅' },
     { value: 'tomorrow', label: 'Amanhã', date: format(tomorrow, 'yyyy-MM-dd'), icon: '📆' },
     { value: 'week', label: 'Próximos 7 dias', dateFrom: format(today, 'yyyy-MM-dd'), dateTo: format(nextWeek, 'yyyy-MM-dd'), icon: '🗓️' },
     { value: 'month', label: 'Próximos 30 dias', dateFrom: format(today, 'yyyy-MM-dd'), dateTo: format(nextMonth, 'yyyy-MM-dd'), icon: '📅' },
-  ];
+    ];
+  }, []);
 
   const handleApply = useCallback(() => {
     handleClickWithFeedback(() => {

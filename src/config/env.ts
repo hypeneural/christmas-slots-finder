@@ -23,7 +23,7 @@ export const DEV_CONFIG = {
 /**
  * Logging helper for development
  */
-export function devLog(message: string, ...args: any[]) {
+export function devLog(message: string, ...args: unknown[]) {
   if (DEV_CONFIG.ENABLE_LOGGING) {
     console.log(`[DEV] ${message}`, ...args);
   }
@@ -32,7 +32,7 @@ export function devLog(message: string, ...args: any[]) {
 /**
  * Debug helper for development
  */
-export function devDebug(message: string, data?: any) {
+export function devDebug(message: string, data?: unknown) {
   if (DEV_CONFIG.ENABLE_DEBUG) {
     console.debug(`[DEBUG] ${message}`, data);
   }

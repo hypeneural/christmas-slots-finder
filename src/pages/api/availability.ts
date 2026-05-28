@@ -1,5 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { AvailabilityClient, QueryFilters, PostBody } from '../../lib/availabilityClient';
+import {
+  AvailabilityClient,
+  QueryFilters,
+  PostBody,
+  type DayCode,
+  type PeriodCode,
+} from '../../lib/availabilityClient';
 
 // ============================================================================
 // API ROUTE HANDLER
@@ -38,9 +44,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         perPage: req.query.perPage ? parseInt(req.query.perPage as string) : undefined,
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
-        daysOfWeek: req.query.daysOfWeek ? (req.query.daysOfWeek as string).split(',') as any : undefined,
+        daysOfWeek: req.query.daysOfWeek ? (req.query.daysOfWeek as string).split(',') as DayCode[] : undefined,
         onlyWeekends: req.query.onlyWeekends === 'true',
-        timeOfDay: req.query.timeOfDay ? (req.query.timeOfDay as string).split(',') as any : undefined,
+        timeOfDay: req.query.timeOfDay ? (req.query.timeOfDay as string).split(',') as PeriodCode[] : undefined,
         timeStart: req.query.timeStart as string,
         timeEnd: req.query.timeEnd as string,
         onlyAfter18: req.query.onlyAfter18 === 'true',

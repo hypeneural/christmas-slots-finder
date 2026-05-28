@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { AvailabilityClient } from '../lib/availabilityClient';
+import { AvailabilityClient, type ApiSuccess } from '../lib/availabilityClient';
 import { getApiBaseUrl, getTimeoutMs, getDefaultTimezone } from '../lib/apiConfig';
 
 interface ApiTestResult {
   success: boolean;
   error?: string;
-  data?: any;
+  data?: ApiSuccess;
   responseTime?: number;
 }
 

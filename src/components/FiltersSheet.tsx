@@ -27,6 +27,13 @@ interface FiltersSheetProps {
   onClearFilters: () => void;
 }
 
+type DateShortcut = {
+  label: string;
+  date?: string;
+  dateFrom?: string;
+  dateTo?: string;
+};
+
 export function FiltersSheet({
   open,
   onOpenChange,
@@ -46,7 +53,7 @@ export function FiltersSheet({
   const today = startOfDay(new Date());
   const tomorrow = addDays(today, 1);
 
-  const dateShortcuts = [
+  const dateShortcuts: DateShortcut[] = [
     { label: 'Hoje', date: format(today, 'yyyy-MM-dd') },
     { label: 'Amanhã', date: format(tomorrow, 'yyyy-MM-dd') },
     { label: 'Próx. 7 dias', dateFrom: format(today, 'yyyy-MM-dd'), dateTo: format(addDays(today, 7), 'yyyy-MM-dd') },
@@ -54,7 +61,7 @@ export function FiltersSheet({
     { label: 'Próx. 30 dias', dateFrom: format(today, 'yyyy-MM-dd'), dateTo: format(addDays(today, 30), 'yyyy-MM-dd') },
   ];
 
-  const handleDateShortcut = (shortcut: any) => {
+  const handleDateShortcut = (shortcut: DateShortcut) => {
     if (shortcut.date) {
       setLocalFilters({ ...localFilters, dateFrom: shortcut.date, dateTo: undefined });
     } else {

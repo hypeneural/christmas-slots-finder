@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { CreditCard, MessageCircle, Timer, AlertCircle } from 'lucide-react';
@@ -12,6 +12,20 @@ interface PaymentDialogProps {
 export function PaymentDialog({ open, onOpenChange }: PaymentDialogProps) {
   const [countdown, setCountdown] = useState(10);
   const [timerActive, setTimerActive] = useState(false);
+
+  const handlePayNow = useCallback(() => {
+    setTimerActive(false);
+    const paymentUrl = import.meta.env.VITE_PAYMENT_URL || 'https://evydencia.com/catalogo/natal';
+    window.open(paymentUrl, '_blank');
+    onOpenChange(false);
+  }, [onOpenChange]);
+
+  const handleWhatsApp = () => {
+    setTimerActive(false);
+    const whatsappUrl = import.meta.env.VITE_WHATSAPP_URL || 'https://w.fotosdenatal.com/';
+    window.open(whatsappUrl, '_blank');
+    onOpenChange(false);
+  };
 
   useEffect(() => {
     if (open) {
@@ -36,21 +50,7 @@ export function PaymentDialog({ open, onOpenChange }: PaymentDialogProps) {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown, timerActive]);
-
-  const handlePayNow = () => {
-    setTimerActive(false);
-    const paymentUrl = import.meta.env.VITE_PAYMENT_URL || 'https://evydencia.com/catalogo/natal';
-    window.open(paymentUrl, '_blank');
-    onOpenChange(false);
-  };
-
-  const handleWhatsApp = () => {
-    setTimerActive(false);
-    const whatsappUrl = import.meta.env.VITE_WHATSAPP_URL || 'https://w.fotosdenatal.com/';
-    window.open(whatsappUrl, '_blank');
-    onOpenChange(false);
-  };
+  }, [countdown, timerActive, handlePayNow]);
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
