@@ -77,7 +77,6 @@ export default function SchedulingPage() {
   }) => {
     const whatsappUrl = buildWhatsAppDeepLink(slot.dateLabel, slot.dayLabel, slot.time, {
       packageName: packageMeta?.name,
-      phoneNumber: stringFrom(cta?.whatsappNumber),
       template: stringFrom(cta?.whatsappMessageTemplate),
     });
 
@@ -263,7 +262,6 @@ export default function SchedulingPage() {
             time={selectedSlot.time}
             packageName={packageMeta.name}
             paymentUrl={stringFrom(cta?.paymentUrl)}
-            whatsappNumber={stringFrom(cta?.whatsappNumber)}
             whatsappMessageTemplate={stringFrom(cta?.whatsappMessageTemplate)}
           />
         </>
