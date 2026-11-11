@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { getDayOfWeekPt, buildAvailableSlots, categorizeSlots, paginateDates, buildWhatsAppDeepLink } from '../scheduling';
 import type { AvailabilityInput } from '../../types';
 
@@ -116,6 +116,33 @@ describe('scheduling utilities', () => {
       expect(link).toContain('15%2F01');
       expect(link).toContain('Segunda');
       expect(link).toContain('14%3A00');
+    });
+
+    it('should always send to the fixed slots WhatsApp number', () => {
+      const link = buildWhatsAppDeepLink('15/01', 'Segunda', '14:00', { packageName: 'Experiência Ho-Ho-Ho' });
+      const message = decodeURIComponent(link.split('?text=')[1]);
+
+      expect(link.startsWith('https://wa.me/5548996425287?text=')).toBe(true);
+      expect(link.split('?text=')[1]).toBe(encodeURIComponent(message));
+      expect(message).toContain('Experiência Ho-Ho-Ho');
+      expect(message).toContain('15/01');
+      expect(message).toContain('Segunda');
+      expect(message).toContain('14:00');
+      expect(link).not.toContain('5548998483594');
+    });
+
+    it('should ignore external phone values and VITE_WHATSAPP_NUMBER', () => {
+      vi.stubEnv('VITE_WHATSAPP_NUMBER', '5511999999999');
+      try {
+        const options = { packageName: 'Boas Festas', phoneNumber: '5511888888888' } as never;
+        const link = buildWhatsAppDeepLink('15/01', 'Segunda', '14:00', options);
+
+        expect(link.startsWith('https://wa.me/5548996425287?text=')).toBe(true);
+        expect(link).not.toContain('5511999999999');
+        expect(link).not.toContain('5511888888888');
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
   });
 });

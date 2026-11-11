@@ -3,6 +3,7 @@ import { fromZonedTime, toZonedTime, formatInTimeZone } from 'date-fns-tz';
 import { ptBR } from 'date-fns/locale';
 import type { AvailabilityInput, Categorized, CategorizedPaged, Holidays, Filters } from '../types';
 import { applyFilters } from './filters';
+import { buildSlotWhatsAppUrl } from './slotWhatsApp';
 
 /**
  * Get Portuguese day of week abbreviation
@@ -221,16 +222,13 @@ export function buildWhatsAppDeepLink(
   time: string,
   options: {
     packageName?: string;
-    phoneNumber?: string;
     template?: string;
   } = {}
 ): string {
-  const phoneNumber = options.phoneNumber || import.meta.env.VITE_WHATSAPP_NUMBER || '5548998483594';
   const message = (options.template || 'Oi, gostaria de agendar {packageName} no dia {date} ({dayLabel}) às {time}!')
     .replace('{packageName}', options.packageName || 'minha sessão de Natal')
     .replace('{date}', dateLabel)
     .replace('{dayLabel}', dayLabel)
     .replace('{time}', time);
-  const encodedMessage = encodeURIComponent(message);
-  return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+  return buildSlotWhatsAppUrl(message);
 }

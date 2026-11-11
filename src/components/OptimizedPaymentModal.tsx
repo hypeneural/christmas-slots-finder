@@ -7,6 +7,7 @@ import { DragIndicator } from './DragIndicator';
 import { VisuallyHidden } from './VisuallyHidden';
 import { useOptimizedTimer } from '@/hooks/useOptimizedTimer';
 import { i18n } from '@/lib/i18n';
+import { buildSlotWhatsAppUrl } from '@/lib/slotWhatsApp';
 import { cn } from '@/lib/utils';
 import { memo, useCallback, useEffect, useState } from 'react';
 
@@ -18,7 +19,6 @@ interface OptimizedPaymentModalProps {
   time: string;
   packageName?: string;
   paymentUrl?: string;
-  whatsappNumber?: string;
   whatsappMessageTemplate?: string;
 }
 
@@ -30,7 +30,6 @@ const OptimizedPaymentModalComponent = ({
   time,
   packageName,
   paymentUrl,
-  whatsappNumber,
   whatsappMessageTemplate
 }: OptimizedPaymentModalProps) => {
   const [timerActive, setTimerActive] = useState(false);
@@ -60,12 +59,10 @@ const OptimizedPaymentModalComponent = ({
           .replace('{date}', dateLabel)
           .replace('{dayLabel}', dayLabel)
           .replace('{time}', time);
-        const phone = whatsappNumber || import.meta.env.VITE_WHATSAPP_NUMBER || '5548998483594';
-        const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
+        window.open(buildSlotWhatsAppUrl(message), '_blank');
       }, 0);
     });
-  }, [dateLabel, dayLabel, packageName, time, whatsappMessageTemplate, whatsappNumber]);
+  }, [dateLabel, dayLabel, packageName, time, whatsappMessageTemplate]);
 
   // Timer effect
   useEffect(() => {
